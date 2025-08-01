@@ -1,2 +1,2 @@
 def hello():
-    return "Hello from demopy!"
+    return "Hello from demopy_gb_jj!"
