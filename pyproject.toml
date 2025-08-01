@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "demopy_gb_jj"
-version = "0.1.1"
+version = "0.2.2"
 description = "A demo PyPI package"
-authors = [{name="Your Name", email="your@email.com"}]
+authors = [{name="jj-devhub", email="Jaid.jashim@infinitibit.com"}]
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "MIT"}
