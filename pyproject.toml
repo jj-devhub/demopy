@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "demopy"
+version = "0.0.1"
+description = "A demo PyPI package"
+authors = [{name="Your Name", email="your@email.com"}]
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+
+[tool.setuptools.packages.find]
+where = ["demopy"]
