@@ -1,0 +1,7 @@
+LICENSE
+README.md
+pyproject.toml
+demopy/demopy_gb_jj.egg-info/PKG-INFO
+demopy/demopy_gb_jj.egg-info/SOURCES.txt
+demopy/demopy_gb_jj.egg-info/dependency_links.txt
+demopy/demopy_gb_jj.egg-info/top_level.txt
