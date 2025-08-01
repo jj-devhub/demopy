@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "demopy_gb_jj"
-version = "0.2.1"
+version = "0.2.2"
 description = "A demo PyPI package"
 authors = [{name="jj-devhub", email="Jaid.jashim@infinitibit.com"}]
 readme = "README.md"
