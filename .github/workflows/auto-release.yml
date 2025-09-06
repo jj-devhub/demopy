@@ -1,0 +1,285 @@
+name: Automated Release Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  analyze-and-version:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.version_check.outputs.should_release }}
+      version_type: ${{ steps.version_check.outputs.version_type }}
+      new_version: ${{ steps.version_check.outputs.new_version }}
+      current_version: ${{ steps.version_check.outputs.current_version }}
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+    
+    - name: Analyze commits and determine version bump
+      id: version_check
+      run: |
+        # Get current version
+        CURRENT_VERSION=$(python scripts/get_version.py)
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "Current version: $CURRENT_VERSION"
+        
+        # Get commits since last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -z "$LAST_TAG" ]; then
+          COMMITS=$(git log --oneline)
+        else
+          COMMITS=$(git log ${LAST_TAG}..HEAD --oneline)
+        fi
+        
+        echo "Analyzing commits since $LAST_TAG:"
+        echo "$COMMITS"
+        
+        # Determine version bump type based on commit messages
+        VERSION_TYPE="none"
+        
+        # Check for breaking changes (major version)
+        if echo "$COMMITS" | grep -qiE "(BREAKING CHANGE|breaking:|major:)"; then
+          VERSION_TYPE="major"
+        # Check for new features (minor version)
+        elif echo "$COMMITS" | grep -qiE "(feat:|feature:|minor:)"; then
+          VERSION_TYPE="minor"
+        # Check for bug fixes and other changes (patch version)
+        elif echo "$COMMITS" | grep -qiE "(fix:|patch:|chore:|docs:|style:|refactor:|perf:|test:)"; then
+          VERSION_TYPE="patch"
+        fi
+        
+        # Skip release if no relevant changes
+        if [ "$VERSION_TYPE" = "none" ]; then
+          echo "No version-relevant changes detected. Skipping release."
+          echo "should_release=false" >> $GITHUB_OUTPUT
+          echo "version_type=none" >> $GITHUB_OUTPUT
+          echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        echo "Determined version bump type: $VERSION_TYPE"
+        echo "should_release=true" >> $GITHUB_OUTPUT
+        echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+        
+        # Calculate new version
+        python scripts/bump_version.py $VERSION_TYPE
+        NEW_VERSION=$(python scripts/get_version.py)
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "New version will be: $NEW_VERSION"
+    
+    - name: Commit version changes
+      if: steps.version_check.outputs.should_release == 'true'
+      run: |
+        git add -A
+        git commit -m "chore: bump version to ${{ steps.version_check.outputs.new_version }} [skip ci]"
+        git push origin main
+    
+    - name: Create and push tag
+      if: steps.version_check.outputs.should_release == 'true'
+      run: |
+        git tag "v${{ steps.version_check.outputs.new_version }}"
+        git push origin "v${{ steps.version_check.outputs.new_version }}"
+
+  build-and-release:
+    needs: analyze-and-version
+    if: needs.analyze-and-version.outputs.should_release == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: v${{ needs.analyze-and-version.outputs.new_version }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+    
+    - name: Install maturin
+      run: pip install maturin
+    
+    - name: Build wheels
+      run: maturin build --release --out dist --find-interpreter
+    
+    - name: Upload wheels
+      uses: actions/upload-artifact@v4
+      with:
+        name: wheels-${{ matrix.os }}
+        path: dist/*.whl
+
+  build-sdist:
+    needs: analyze-and-version
+    if: needs.analyze-and-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: v${{ needs.analyze-and-version.outputs.new_version }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install maturin
+      run: pip install maturin
+    
+    - name: Build source distribution
+      run: maturin sdist --out dist
+    
+    - name: Upload sdist
+      uses: actions/upload-artifact@v4
+      with:
+        name: sdist
+        path: dist/*.tar.gz
+
+  publish:
+    needs: [analyze-and-version, build-and-release, build-sdist]
+    if: needs.analyze-and-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    environment: release
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist-artifacts
+    
+    - name: Flatten artifacts
+      run: |
+        mkdir -p dist
+        find dist-artifacts -name "*.whl" -exec cp {} dist/ \;
+        find dist-artifacts -name "*.tar.gz" -exec cp {} dist/ \;
+        ls -la dist/
+    
+    - name: Check if version already exists on PyPI
+      id: check_version
+      run: |
+        VERSION=${{ needs.analyze-and-version.outputs.new_version }}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        
+        if pip index versions demopy_gb_jj 2>/dev/null | grep -q "$VERSION"; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "⚠️  Version $VERSION already exists on PyPI"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "✅ Version $VERSION is new, proceeding with upload"
+        fi
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: dist/
+        password: ${{ secrets.PYPI_API_TOKEN || '' }}
+        skip-existing: true
+        verbose: true
+
+  create-release:
+    needs: [analyze-and-version, publish]
+    if: needs.analyze-and-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: v${{ needs.analyze-and-version.outputs.new_version }}
+    
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get the previous tag
+        CURRENT_TAG="v${{ needs.analyze-and-version.outputs.new_version }}"
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 $CURRENT_TAG^ 2>/dev/null || echo "")
+        
+        echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG"
+        
+        # Generate changelog content
+        CHANGELOG="## What's Changed\n\n"
+        
+        if [ -z "$PREVIOUS_TAG" ]; then
+          COMMITS=$(git log --oneline --pretty=format:"* %s (%h)" $CURRENT_TAG)
+        else
+          COMMITS=$(git log --oneline --pretty=format:"* %s (%h)" ${PREVIOUS_TAG}..${CURRENT_TAG})
+        fi
+        
+        # Categorize commits
+        FEATURES=$(echo "$COMMITS" | grep -iE "(feat:|feature:)" || true)
+        FIXES=$(echo "$COMMITS" | grep -iE "(fix:|patch:)" || true)
+        CHORES=$(echo "$COMMITS" | grep -iE "(chore:|docs:|style:|refactor:|perf:|test:)" || true)
+        BREAKING=$(echo "$COMMITS" | grep -iE "(BREAKING CHANGE|breaking:|major:)" || true)
+        
+        if [ ! -z "$BREAKING" ]; then
+          CHANGELOG="${CHANGELOG}### 🚨 Breaking Changes\n${BREAKING}\n\n"
+        fi
+        
+        if [ ! -z "$FEATURES" ]; then
+          CHANGELOG="${CHANGELOG}### ✨ New Features\n${FEATURES}\n\n"
+        fi
+        
+        if [ ! -z "$FIXES" ]; then
+          CHANGELOG="${CHANGELOG}### 🐛 Bug Fixes\n${FIXES}\n\n"
+        fi
+        
+        if [ ! -z "$CHORES" ]; then
+          CHANGELOG="${CHANGELOG}### 🔧 Maintenance\n${CHORES}\n\n"
+        fi
+        
+        # Add installation instructions
+        CHANGELOG="${CHANGELOG}### 📦 Installation\n\n"
+        CHANGELOG="${CHANGELOG}\`\`\`bash\n"
+        CHANGELOG="${CHANGELOG}pip install demopy_gb_jj==${{ needs.analyze-and-version.outputs.new_version }}\n"
+        CHANGELOG="${CHANGELOG}\`\`\`\n\n"
+        
+        # Add usage example
+        CHANGELOG="${CHANGELOG}### 🚀 Usage\n\n"
+        CHANGELOG="${CHANGELOG}\`\`\`python\n"
+        CHANGELOG="${CHANGELOG}import demopy\n"
+        CHANGELOG="${CHANGELOG}print(demopy.hello())  # Hello from demopy_gb_jj!\n"
+        CHANGELOG="${CHANGELOG}print(demopy.add(5, 7))  # 12\n"
+        CHANGELOG="${CHANGELOG}\`\`\`\n"
+        
+        # Save changelog to file and output
+        echo -e "$CHANGELOG" > changelog.md
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ needs.analyze-and-version.outputs.new_version }}
+        name: Release v${{ needs.analyze-and-version.outputs.new_version }}
+        body: ${{ steps.changelog.outputs.changelog }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true

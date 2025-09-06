@@ -1,4 +1,4 @@
-name: Version Bump
+name: Manual Version Bump
 
 on:
   workflow_dispatch:
@@ -16,6 +16,11 @@ on:
         description: 'Custom version (optional, overrides bump_type)'
         required: false
         type: string
+      skip_auto_release:
+        description: 'Skip automatic release workflow trigger'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   bump-version:
@@ -54,7 +59,11 @@ jobs:
     - name: Commit changes
       run: |
         git add -A
-        git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}"
+        if [ "${{ github.event.inputs.skip_auto_release }}" = "true" ]; then
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }} [skip ci]"
+        else
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
+        fi
         git push origin main
     
     - name: Create and push tag

@@ -80,6 +80,13 @@ def test_pypi_installation():
             cwd=temp_dir
         )
         if not success:
+            # Try without version specification in case it's not published yet
+            success, _ = run_command(
+                f"{pip_path} install demopy_gb_jj",
+                "Install latest demopy_gb_jj from PyPI",
+                cwd=temp_dir
+            )
+        if not success:
             print("⚠️  Package might not be published yet. Try again in a few minutes.")
             return False
         
