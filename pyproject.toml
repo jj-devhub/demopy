@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "demopy_gb_jj"
-version = "0.3.0"
+version = "0.4.0"
 description = "A demo PyPI package with Rust extensions"
 authors = [{name="jj-devhub", email="Jaid.jashim@infinitibit.com"}]
 readme = "README.md"
