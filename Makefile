@@ -187,3 +187,13 @@ tools-list:
 tools-clean:
 	@echo "🧹 Cleaning Rust tool cache..."
 	python scripts/install_rust_tools.py --mode clean
+
+# Validate Python package structure
+validate-python:
+	@echo "🔍 Validating Python package structure..."
+	python scripts/test_python_structure.py
+
+# Test Python fallback only
+test-python-fallback:
+	@echo "🐍 Testing Python fallback implementation..."
+	PYTHONPATH=python python -c "import demopy; print('Version:', demopy.__version__); print('Hello:', demopy.hello())"

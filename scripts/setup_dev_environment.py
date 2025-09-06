@@ -157,7 +157,12 @@ def run_initial_checks():
     print("\n" + "="*50)
     print("🔍 RUNNING INITIAL QUALITY CHECKS")
     print("="*50)
-    
+
+    # First validate Python package structure
+    success = run_command("python scripts/test_python_structure.py", "Validate Python package structure", check=False)
+    if not success:
+        print("⚠️  Python package structure validation failed, but continuing...")
+
     checks = [
         ("cargo fmt --all -- --check", "Check Rust formatting"),
         ("cargo clippy --all-targets --all-features -- -D warnings", "Run Rust linting"),
@@ -165,6 +170,7 @@ def run_initial_checks():
         ("black --check python/ tests/", "Check Python formatting"),
         ("isort --check-only python/ tests/", "Check Python import sorting"),
         ("flake8 python/ tests/", "Run Python linting"),
+        ("PYTHONPATH=python python -c 'import demopy; print(\"Python fallback works:\", demopy.hello())'", "Test Python fallback import"),
     ]
     
     results = []
