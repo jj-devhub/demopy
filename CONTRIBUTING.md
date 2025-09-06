@@ -106,19 +106,35 @@ Or use commit types that don't trigger releases:
    cd demopy
    ```
 
-2. **Install development dependencies:**
+2. **Set up development environment (automated):**
    ```bash
-   pip install maturin pytest
+   python scripts/setup_dev_environment.py
+   ```
+
+   Or manually:
+   ```bash
+   # Install Rust tools
+   rustup component add rustfmt clippy
+
+   # Install Python tools
+   pip install black isort flake8 mypy pytest pre-commit maturin
+
+   # Set up pre-commit hooks
+   pre-commit install
    ```
 
 3. **Build and install in development mode:**
    ```bash
    maturin develop
+   # Or use the Makefile
+   make dev-install
    ```
 
 4. **Run tests:**
    ```bash
    pytest
+   # Or use the Makefile
+   make test
    ```
 
 ### **Making Changes:**
@@ -188,23 +204,52 @@ python3.10 -m pytest
 
 ## 📋 Code Standards
 
+### **Automated Code Quality:**
+Our project uses automated code formatting and quality checks:
+
+- **Pre-commit hooks**: Automatically format and check code before commits
+- **CI/CD pipeline**: Runs comprehensive quality checks on every push
+- **Make commands**: Easy access to all quality tools
+
 ### **Python Code:**
-- Follow PEP 8 style guidelines
-- Use type hints where appropriate
-- Write docstrings for all public functions
-- Include tests for new functionality
+- **Formatting**: Automatically formatted with `black` (88 char line length)
+- **Import sorting**: Automatically sorted with `isort`
+- **Linting**: Checked with `flake8`
+- **Type checking**: Optional `mypy` type checking
+- **Testing**: Use `pytest` for all tests
+- **Security**: Scanned with `safety` and `bandit`
 
 ### **Rust Code:**
-- Follow standard Rust formatting (`cargo fmt`)
-- Use `cargo clippy` for linting
-- Write comprehensive tests
-- Document public APIs
+- **Formatting**: Automatically formatted with `cargo fmt`
+- **Linting**: Checked with `cargo clippy` (warnings as errors)
+- **Testing**: Comprehensive test coverage required
+- **Security**: Audited with `cargo audit`
+- **Documentation**: Document all public APIs
+
+### **Quality Commands:**
+```bash
+# Format all code
+make format
+
+# Run all linters
+make lint
+
+# Run all tests
+make test
+
+# Run all quality checks
+make check
+
+# Simulate CI pipeline locally
+make ci
+```
 
 ### **Commit Messages:**
 - Use semantic commit message format
 - Keep the first line under 50 characters
 - Use imperative mood ("add" not "added")
 - Reference issues when applicable
+- **Pre-commit hooks will check your commit message format**
 
 ## 🐛 Reporting Issues
 

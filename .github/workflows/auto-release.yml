@@ -36,6 +36,17 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+
+    - name: Check Rust formatting
+      run: cargo fmt --all -- --check
+
+    - name: Run Rust linting
+      run: cargo clippy --all-targets --all-features -- -D warnings
     
     - name: Analyze commits and determine version bump
       id: version_check
@@ -122,7 +133,15 @@ jobs:
 
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
-    
+      with:
+        components: rustfmt, clippy
+
+    - name: Check Rust formatting
+      run: cargo fmt --all -- --check
+
+    - name: Run Rust linting
+      run: cargo clippy --all-targets --all-features -- -D warnings
+
     - name: Install maturin
       run: pip install maturin
     
