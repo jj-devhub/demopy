@@ -169,4 +169,21 @@ deps:
 	@echo "📦 Installing development dependencies..."
 	pip install black isort flake8 mypy pytest pre-commit maturin safety bandit
 	rustup component add rustfmt clippy
-	cargo install cargo-audit cargo-machete --locked
+	python scripts/install_rust_tools.py --mode dev
+
+# Install CI dependencies only
+deps-ci:
+	@echo "🤖 Installing CI dependencies..."
+	pip install black isort flake8 pytest maturin
+	rustup component add rustfmt clippy
+	python scripts/install_rust_tools.py --mode ci
+
+# List installed Rust tools
+tools-list:
+	@echo "📋 Listing installed Rust tools..."
+	python scripts/install_rust_tools.py --mode list
+
+# Clean Rust tool cache
+tools-clean:
+	@echo "🧹 Cleaning Rust tool cache..."
+	python scripts/install_rust_tools.py --mode clean

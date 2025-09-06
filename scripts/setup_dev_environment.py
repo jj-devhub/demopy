@@ -62,9 +62,8 @@ def setup_rust_tools():
     success &= run_command("rustup component add rustfmt", "Install rustfmt")
     success &= run_command("rustup component add clippy", "Install clippy")
     
-    # Install additional Rust tools
-    success &= run_command("cargo install cargo-audit --locked", "Install cargo-audit", check=False)
-    success &= run_command("cargo install cargo-machete --locked", "Install cargo-machete", check=False)
+    # Install additional Rust tools using our installation script
+    success &= run_command("python scripts/install_rust_tools.py --mode dev", "Install Rust development tools", check=False)
     
     return success
 
