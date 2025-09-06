@@ -1,0 +1,32 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Rust source files should always use LF line endings
+*.rs text eol=lf
+*.toml text eol=lf
+
+# Python source files should always use LF line endings  
+*.py text eol=lf
+
+# YAML files should always use LF line endings
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Markdown files should always use LF line endings
+*.md text eol=lf
+
+# Shell scripts should always use LF line endings
+*.sh text eol=lf
+
+# Batch files should use CRLF line endings
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files should not be modified
+*.whl binary
+*.tar.gz binary
+*.zip binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary

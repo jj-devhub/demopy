@@ -1,9 +1,13 @@
+# Rust formatting configuration
 max_width = 100
 hard_tabs = false
 tab_spaces = 4
-newline_style = "Unix"
+newline_style = "Unix"  # Always use LF line endings
 use_small_heuristics = "Default"
 reorder_imports = true
 reorder_modules = true
 remove_nested_parens = true
 edition = "2021"
+
+# Additional formatting options for consistency (stable features only)
+# Note: Some advanced formatting options require nightly Rust

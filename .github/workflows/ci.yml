@@ -145,6 +145,24 @@ jobs:
       shell: bash
       run: cargo test
 
+    - name: Normalize line endings for Rust files
+      shell: bash
+      run: |
+        echo "Normalizing line endings for Rust files..."
+
+        # Convert any CRLF to LF in Rust source files
+        find . -name "*.rs" -type f -exec dos2unix {} \; 2>/dev/null || {
+          # Fallback if dos2unix is not available
+          find . -name "*.rs" -type f -print0 | xargs -0 sed -i 's/\r$//'
+        }
+
+        # Also normalize TOML files
+        find . -name "*.toml" -type f -exec dos2unix {} \; 2>/dev/null || {
+          find . -name "*.toml" -type f -print0 | xargs -0 sed -i 's/\r$//'
+        }
+
+        echo "Line ending normalization complete"
+
     - name: Run Rust linting
       shell: bash
       run: |
