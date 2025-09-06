@@ -90,6 +90,8 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         packages-dir: dist/
+        # Use API token if provided, otherwise use trusted publishing
+        password: ${{ secrets.PYPI_API_TOKEN || '' }}
 
   create-release:
     needs: [publish]
