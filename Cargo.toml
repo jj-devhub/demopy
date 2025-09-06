@@ -1,0 +1,19 @@
+[package]
+name = "demopy_gb_jj"
+version = "0.3.0"
+edition = "2021"
+description = "A demo PyPI package with Rust extensions"
+authors = ["jj-devhub <Jaid.jashim@infinitibit.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/jj-devhub/demopy"
+
+[lib]
+name = "demopy_gb_jj"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.22", features = ["extension-module"] }
+
+[build-dependencies]
+pyo3-build-config = "0.22"

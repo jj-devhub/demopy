@@ -1,0 +1,83 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+      custom_version:
+        description: 'Custom version (optional, overrides bump_type)'
+        required: false
+        type: string
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+    
+    - name: Bump version
+      id: bump
+      run: |
+        if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+          python scripts/bump_version.py "${{ github.event.inputs.custom_version }}"
+          NEW_VERSION="${{ github.event.inputs.custom_version }}"
+        else
+          python scripts/bump_version.py "${{ github.event.inputs.bump_type }}"
+          NEW_VERSION=$(python -c "
+          import re
+          with open('pyproject.toml', 'r') as f:
+              content = f.read()
+          match = re.search(r'version = \"([^\"]+)\"', content)
+          print(match.group(1))
+          ")
+        fi
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+    
+    - name: Commit changes
+      run: |
+        git add -A
+        git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}"
+        git push origin main
+    
+    - name: Create and push tag
+      run: |
+        git tag "v${{ steps.bump.outputs.new_version }}"
+        git push origin "v${{ steps.bump.outputs.new_version }}"
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.bump.outputs.new_version }}
+        release_name: Release v${{ steps.bump.outputs.new_version }}
+        body: |
+          Automated release for version ${{ steps.bump.outputs.new_version }}
+          
+          This release was created automatically by the version bump workflow.
+        draft: false
+        prerelease: false
