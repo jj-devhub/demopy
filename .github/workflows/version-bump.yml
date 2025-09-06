@@ -47,13 +47,7 @@ jobs:
           NEW_VERSION="${{ github.event.inputs.custom_version }}"
         else
           python scripts/bump_version.py "${{ github.event.inputs.bump_type }}"
-          NEW_VERSION=$(python -c "
-          import re
-          with open('pyproject.toml', 'r') as f:
-              content = f.read()
-          match = re.search(r'version = \"([^\"]+)\"', content)
-          print(match.group(1))
-          ")
+          NEW_VERSION=$(python scripts/get_version.py)
         fi
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
     
