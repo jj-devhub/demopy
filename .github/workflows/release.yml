@@ -85,6 +85,22 @@ jobs:
         find dist-artifacts -name "*.whl" -exec cp {} dist/ \;
         find dist-artifacts -name "*.tar.gz" -exec cp {} dist/ \;
         ls -la dist/
+
+    - name: Check if version already exists on PyPI
+      id: check_version
+      run: |
+        # Extract version from tag
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+        # Check if version exists on PyPI
+        if pip index versions demopy_gb_jj 2>/dev/null | grep -q "$VERSION"; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "⚠️  Version $VERSION already exists on PyPI"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "✅ Version $VERSION is new, proceeding with upload"
+        fi
     
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
@@ -92,6 +108,10 @@ jobs:
         packages-dir: dist/
         # Use API token if provided, otherwise use trusted publishing
         password: ${{ secrets.PYPI_API_TOKEN || '' }}
+        # Skip upload if files already exist (prevents re-run failures)
+        skip-existing: true
+        # Print helpful message about what's happening
+        verbose: true
 
   create-release:
     needs: [publish]
