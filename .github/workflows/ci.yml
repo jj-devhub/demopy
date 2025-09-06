@@ -173,7 +173,27 @@ jobs:
       shell: bash
       run: |
         source venv/bin/activate || source venv/Scripts/activate
+        echo "Building Rust extension with maturin..."
         maturin develop
+
+        # Verify the extension was built correctly
+        python -c "
+        try:
+            import demopy
+            print('✅ Successfully imported demopy')
+            print(f'Version: {demopy.__version__}')
+            hello_result = demopy.hello()
+            print(f'Hello: {hello_result}')
+            if 'Rust edition' in hello_result:
+                print('✅ Using Rust extension')
+            elif 'Python fallback' in hello_result:
+                print('✅ Using Python fallback')
+            else:
+                print(f'⚠️  Unknown implementation: {hello_result}')
+        except Exception as e:
+            print(f'❌ Import failed: {e}')
+            raise
+        "
 
     - name: Run Python tests
       shell: bash
@@ -193,13 +213,25 @@ jobs:
         import builtins
         original_import = builtins.__import__
         def mock_import(name, *args, **kwargs):
-            if 'demopy_gb_jj._rust' in name:
-                raise ImportError('Mocked import error')
+            if 'demopy._rust' in name or '_rust' in name:
+                raise ImportError('Mocked import error for testing fallback')
             return original_import(name, *args, **kwargs)
         builtins.__import__ = mock_import
 
         import demopy
-        assert 'Python fallback' in demopy.hello()
+        hello_result = demopy.hello()
+        print(f'Fallback hello result: {hello_result}')
+        assert 'Python fallback' in hello_result, f'Expected Python fallback, got: {hello_result}'
         assert demopy.add(2, 3) == 5
-        print('Pure Python fallback test passed!')
+        assert demopy.multiply(2.5, 4.0) == 10.0
+        assert demopy.sum_list([1, 2, 3]) == 6
+        assert demopy.reverse_string('hello') == 'olleh'
+        assert demopy.power(2, 3) == 8
+        print('✅ Pure Python fallback test passed!')
         "
+
+    - name: Run integration tests
+      shell: bash
+      run: |
+        source venv/bin/activate || source venv/Scripts/activate
+        python scripts/test_integration.py

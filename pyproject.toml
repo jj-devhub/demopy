@@ -33,4 +33,5 @@ Issues = "https://github.com/jj-devhub/demopy/issues"
 [tool.maturin]
 features = ["pyo3/extension-module"]
 python-source = "python"
-module-name = "demopy_gb_jj._rust"
+# Map the Rust module to the correct Python module name
+module-name = "demopy._rust"

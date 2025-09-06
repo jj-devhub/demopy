@@ -8,9 +8,10 @@ __version__ = "0.4.0"
 
 try:
     # Import the Rust extension
-    from demopy_gb_jj._rust import add
-    from demopy_gb_jj._rust import hello as _rust_hello
-    from demopy_gb_jj._rust import multiply, power, reverse_string, sum_list
+    # When installed via maturin, the Rust module will be available as demopy._rust
+    from demopy._rust import add
+    from demopy._rust import hello as _rust_hello
+    from demopy._rust import multiply, power, reverse_string, sum_list
 
     # Use the Rust implementation for hello
     def hello():

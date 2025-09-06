@@ -38,8 +38,9 @@ fn power(base: f64, exponent: f64) -> f64 {
 }
 
 /// A Python module implemented in Rust.
+/// This creates the _rust submodule that will be imported by the Python wrapper.
 #[pymodule]
-fn demopy_gb_jj(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(hello, m)?)?;
     m.add_function(wrap_pyfunction!(add, m)?)?;
     m.add_function(wrap_pyfunction!(multiply, m)?)?;
