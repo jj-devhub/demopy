@@ -27,6 +27,57 @@ jobs:
       uses: dtolnay/rust-toolchain@stable
       with:
         components: rustfmt, clippy
+
+    - name: Setup Rust environment (Windows fix)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        echo "Setting up Rust environment for Windows..."
+
+        # Ensure cargo is in PATH
+        if [ -f "$HOME/.cargo/bin/cargo" ] || [ -f "$HOME/.cargo/bin/cargo.exe" ]; then
+          echo "Found existing Rust installation"
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "CARGO_HOME=$HOME/.cargo" >> $GITHUB_ENV
+        else
+          echo "Installing Rust via rustup..."
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --component rustfmt clippy
+          source $HOME/.cargo/env
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "CARGO_HOME=$HOME/.cargo" >> $GITHUB_ENV
+        fi
+
+        # Verify installation
+        export PATH="$HOME/.cargo/bin:$PATH"
+        cargo --version || echo "Cargo still not available"
+
+    - name: Verify Rust installation
+      shell: bash
+      run: |
+        echo "Rust version:"
+        rustc --version
+        echo "Cargo version:"
+        cargo --version
+        echo "PATH: $PATH"
+        echo "CARGO_HOME: ${CARGO_HOME:-not set}"
+
+    - name: Ensure Rust is in PATH (All platforms)
+      shell: bash
+      run: |
+        echo "Ensuring Rust is available in PATH..."
+
+        # Add cargo to PATH if it exists but isn't in PATH
+        if [ -d "$HOME/.cargo/bin" ]; then
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "CARGO_HOME=$HOME/.cargo" >> $GITHUB_ENV
+          echo "Added $HOME/.cargo/bin to PATH"
+        fi
+
+        # For Windows, also try the Windows-style path
+        if [ "$RUNNER_OS" = "Windows" ] && [ -d "/c/Users/runneradmin/.cargo/bin" ]; then
+          echo "/c/Users/runneradmin/.cargo/bin" >> $GITHUB_PATH
+          echo "Added Windows cargo path to PATH"
+        fi
     
     - name: Cache Rust dependencies
       uses: actions/cache@v4
@@ -52,10 +103,50 @@ jobs:
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
         echo "PATH=$PATH" >> $GITHUB_ENV
     
+    - name: Debug and verify Rust toolchain
+      shell: bash
+      run: |
+        echo "=== RUST TOOLCHAIN DEBUG ==="
+        echo "Operating System: $RUNNER_OS"
+        echo "PATH: $PATH"
+        echo "CARGO_HOME: ${CARGO_HOME:-not set}"
+        echo "HOME: $HOME"
+
+        echo "=== SEARCHING FOR CARGO ==="
+        # Try to find cargo in various locations
+        for path in \
+          "cargo" \
+          "$HOME/.cargo/bin/cargo" \
+          "/c/Users/runneradmin/.cargo/bin/cargo" \
+          "/c/Users/runneradmin/.cargo/bin/cargo.exe" \
+          "$(which cargo 2>/dev/null || echo 'not found')"
+        do
+          if command -v "$path" &> /dev/null; then
+            echo "✅ Found cargo at: $path"
+            "$path" --version
+            break
+          else
+            echo "❌ Not found: $path"
+          fi
+        done
+
+        echo "=== FINAL VERIFICATION ==="
+        if command -v cargo &> /dev/null; then
+          echo "✅ Cargo is available"
+          cargo --version
+        else
+          echo "❌ Cargo is NOT available"
+          echo "Available commands:"
+          compgen -c | grep -i rust || echo "No rust-related commands found"
+          exit 1
+        fi
+
     - name: Run Rust tests
+      shell: bash
       run: cargo test
 
     - name: Run Rust linting
+      shell: bash
       run: |
         cargo fmt --all -- --check
         cargo clippy -- -D warnings
