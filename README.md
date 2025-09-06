@@ -13,7 +13,7 @@ A minimal Rust-based Python extension using PyO3 bindings with automated CI/CD p
 - **Automated CI/CD**: GitHub Actions workflows for testing, building, and publishing
 - **Version Management**: Automated version bumping across all project files
 - **Cross-Platform**: Supports Windows, macOS, and Linux
-- **Multiple Python Versions**: Compatible with Python 3.8-3.12
+- **Multiple Python Versions**: Compatible with Python 3.8-3.13
 
 ## Installation
 
@@ -65,7 +65,7 @@ print(demopy.__version__)  # Current version
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.8 or higher (tested up to 3.13)
 - Rust 1.70 or higher
 - Git
 
