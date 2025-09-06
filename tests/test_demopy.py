@@ -79,10 +79,11 @@ class TestModuleStructure:
         assert hasattr(demopy, "__all__")
         expected_exports = {
             "hello",
-            "add", 
+            "add",
             "multiply",
             "sum_list",
             "reverse_string",
+            "power",
             "__version__"
         }
         assert set(demopy.__all__) == expected_exports

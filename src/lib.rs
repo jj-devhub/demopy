@@ -31,6 +31,12 @@ fn reverse_string(s: String) -> String {
     s.chars().rev().collect()
 }
 
+/// A function that calculates the power of a number (base^exponent)
+#[pyfunction]
+fn power(base: f64, exponent: f64) -> f64 {
+    base.powf(exponent)
+}
+
 /// A Python module implemented in Rust.
 #[pymodule]
 fn demopy_gb_jj(m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -39,6 +45,7 @@ fn demopy_gb_jj(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(multiply, m)?)?;
     m.add_function(wrap_pyfunction!(sum_list, m)?)?;
     m.add_function(wrap_pyfunction!(reverse_string, m)?)?;
+    m.add_function(wrap_pyfunction!(power, m)?)?;
     Ok(())
 }
 
@@ -79,5 +86,27 @@ mod tests {
         let result = hello();
         assert!(result.contains("demopy_gb_jj"));
         assert!(result.contains("Rust edition"));
+    }
+
+    #[test]
+    fn test_power() {
+        // Basic power calculations
+        assert_eq!(power(2.0, 3.0), 8.0);
+        assert_eq!(power(5.0, 2.0), 25.0);
+        assert_eq!(power(10.0, 0.0), 1.0);
+
+        // Edge cases
+        assert_eq!(power(0.0, 5.0), 0.0);
+        assert_eq!(power(1.0, 100.0), 1.0);
+        assert_eq!(power(-2.0, 3.0), -8.0);
+        assert_eq!(power(-2.0, 2.0), 4.0);
+
+        // Fractional exponents (square root, cube root)
+        assert!((power(4.0, 0.5) - 2.0).abs() < 1e-10);
+        assert!((power(8.0, 1.0/3.0) - 2.0).abs() < 1e-10);
+
+        // Negative exponents
+        assert!((power(2.0, -1.0) - 0.5).abs() < 1e-10);
+        assert!((power(4.0, -0.5) - 0.5).abs() < 1e-10);
     }
 }

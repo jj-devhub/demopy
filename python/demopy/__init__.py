@@ -14,6 +14,7 @@ try:
         multiply,
         sum_list,
         reverse_string,
+        power,
     )
     
     # Use the Rust implementation for hello
@@ -24,10 +25,11 @@ try:
     # Export all functions
     __all__ = [
         "hello",
-        "add", 
+        "add",
         "multiply",
         "sum_list",
         "reverse_string",
+        "power",
         "__version__"
     ]
     
@@ -52,12 +54,17 @@ except ImportError:
     def reverse_string(s):
         """Reverse a string (pure Python fallback)."""
         return s[::-1]
-    
+
+    def power(base, exponent):
+        """Calculate the power of a number (base^exponent) (pure Python fallback)."""
+        return base ** exponent
+
     __all__ = [
         "hello",
         "add",
-        "multiply", 
+        "multiply",
         "sum_list",
         "reverse_string",
+        "power",
         "__version__"
     ]
