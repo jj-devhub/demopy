@@ -30,7 +30,7 @@ jobs:
         fetch-depth: 0
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     
@@ -69,15 +69,13 @@ jobs:
         git push origin "v${{ steps.bump.outputs.new_version }}"
     
     - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ steps.bump.outputs.new_version }}
-        release_name: Release v${{ steps.bump.outputs.new_version }}
+        name: Release v${{ steps.bump.outputs.new_version }}
         body: |
           Automated release for version ${{ steps.bump.outputs.new_version }}
-          
+
           This release was created automatically by the version bump workflow.
         draft: false
         prerelease: false

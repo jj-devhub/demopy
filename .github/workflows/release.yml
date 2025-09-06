@@ -16,15 +16,12 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    
+
     - name: Set up Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      uses: dtolnay/rust-toolchain@stable
     
     - name: Install maturin
       run: pip install maturin
@@ -33,7 +30,7 @@ jobs:
       run: maturin build --release --out dist --find-interpreter
     
     - name: Upload wheels
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wheels-${{ matrix.os }}
         path: dist
@@ -44,15 +41,12 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    
+
     - name: Set up Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      uses: dtolnay/rust-toolchain@stable
     
     - name: Install maturin
       run: pip install maturin
@@ -61,7 +55,7 @@ jobs:
       run: maturin sdist --out dist
     
     - name: Upload sdist
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sdist
         path: dist
@@ -75,7 +69,7 @@ jobs:
     
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: dist-artifacts
     
@@ -108,10 +102,10 @@ jobs:
         # Get the tag name
         TAG_NAME=${GITHUB_REF#refs/tags/}
         echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-        
+
         # Get previous tag
         PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-        
+
         # Generate changelog
         if [ -n "$PREV_TAG" ]; then
           echo "## Changes since $PREV_TAG" > changelog.md
@@ -120,18 +114,18 @@ jobs:
           echo "## Initial Release" > changelog.md
           echo "First release of demopy_gb_jj with Rust extensions" >> changelog.md
         fi
-        
-        echo "changelog<<EOF" >> $GITHUB_OUTPUT
-        cat changelog.md >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-    
+
+        {
+          echo "changelog<<EOF"
+          cat changelog.md
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
+
     - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.changelog.outputs.tag_name }}
-        release_name: Release ${{ steps.changelog.outputs.tag_name }}
+        name: Release ${{ steps.changelog.outputs.tag_name }}
         body: ${{ steps.changelog.outputs.changelog }}
         draft: false
         prerelease: false

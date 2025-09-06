@@ -3,32 +3,32 @@ use pyo3::types::PyModule;
 
 /// A simple function that returns a greeting message
 #[pyfunction]
-fn hello() -> PyResult<String> {
-    Ok("Hello from demopy_gb_jj (Rust edition)!".to_string())
+fn hello() -> String {
+    "Hello from demopy_gb_jj (Rust edition)!".to_string()
 }
 
 /// A function that adds two numbers
 #[pyfunction]
-fn add(a: i64, b: i64) -> PyResult<i64> {
-    Ok(a + b)
+fn add(a: i64, b: i64) -> i64 {
+    a + b
 }
 
 /// A function that multiplies two numbers
 #[pyfunction]
-fn multiply(a: f64, b: f64) -> PyResult<f64> {
-    Ok(a * b)
+fn multiply(a: f64, b: f64) -> f64 {
+    a * b
 }
 
 /// A function that processes a list of numbers and returns their sum
 #[pyfunction]
-fn sum_list(numbers: Vec<i64>) -> PyResult<i64> {
-    Ok(numbers.iter().sum())
+fn sum_list(numbers: Vec<i64>) -> i64 {
+    numbers.iter().sum()
 }
 
 /// A function that reverses a string
 #[pyfunction]
-fn reverse_string(s: String) -> PyResult<String> {
-    Ok(s.chars().rev().collect())
+fn reverse_string(s: String) -> String {
+    s.chars().rev().collect()
 }
 
 /// A Python module implemented in Rust.
@@ -48,35 +48,35 @@ mod tests {
 
     #[test]
     fn test_add() {
-        assert_eq!(add(2, 3).unwrap(), 5);
-        assert_eq!(add(-1, 1).unwrap(), 0);
-        assert_eq!(add(0, 0).unwrap(), 0);
+        assert_eq!(add(2, 3), 5);
+        assert_eq!(add(-1, 1), 0);
+        assert_eq!(add(0, 0), 0);
     }
 
     #[test]
     fn test_multiply() {
-        assert_eq!(multiply(2.0, 3.0).unwrap(), 6.0);
-        assert_eq!(multiply(-1.0, 1.0).unwrap(), -1.0);
-        assert_eq!(multiply(0.0, 100.0).unwrap(), 0.0);
+        assert_eq!(multiply(2.0, 3.0), 6.0);
+        assert_eq!(multiply(-1.0, 1.0), -1.0);
+        assert_eq!(multiply(0.0, 100.0), 0.0);
     }
 
     #[test]
     fn test_sum_list() {
-        assert_eq!(sum_list(vec![1, 2, 3, 4, 5]).unwrap(), 15);
-        assert_eq!(sum_list(vec![]).unwrap(), 0);
-        assert_eq!(sum_list(vec![-1, -2, -3]).unwrap(), -6);
+        assert_eq!(sum_list(vec![1, 2, 3, 4, 5]), 15);
+        assert_eq!(sum_list(vec![]), 0);
+        assert_eq!(sum_list(vec![-1, -2, -3]), -6);
     }
 
     #[test]
     fn test_reverse_string() {
-        assert_eq!(reverse_string("hello".to_string()).unwrap(), "olleh");
-        assert_eq!(reverse_string("".to_string()).unwrap(), "");
-        assert_eq!(reverse_string("a".to_string()).unwrap(), "a");
+        assert_eq!(reverse_string("hello".to_string()), "olleh");
+        assert_eq!(reverse_string("".to_string()), "");
+        assert_eq!(reverse_string("a".to_string()), "a");
     }
 
     #[test]
     fn test_hello() {
-        let result = hello().unwrap();
+        let result = hello();
         assert!(result.contains("demopy_gb_jj"));
         assert!(result.contains("Rust edition"));
     }
