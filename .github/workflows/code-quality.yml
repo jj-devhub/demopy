@@ -53,13 +53,13 @@ jobs:
     
     - name: Install Rust tools
       run: |
-        echo "🛠️  Installing Rust tools for CI..."
+        echo "[SETUP] Installing Rust tools for CI..."
         python scripts/install_rust_tools.py --mode ci
 
     - name: Check for unused dependencies
       run: |
-        echo "🔍 Checking for unused dependencies..."
-        cargo machete || echo "⚠️  cargo-machete check completed with warnings"
+        echo "Checking for unused dependencies..."
+        cargo machete || echo "[WARN] cargo-machete check completed with warnings"
 
   python-quality:
     name: Python Code Quality
@@ -93,7 +93,7 @@ jobs:
         echo "PYTHONPATH=${PYTHONPATH}:$(pwd)/python" >> $GITHUB_ENV
 
         # Validate that the package can be imported
-        python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('✅ demopy module imported successfully')"
+        python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('[OK] demopy module imported successfully')"
         python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('Package version:', demopy.__version__)"
     
     - name: Check Python formatting (Black)
@@ -116,7 +116,7 @@ jobs:
         echo "PYTHONPATH: $PYTHONPATH"
 
         # Test that the module can be imported
-        python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('✅ demopy module imported successfully')"
+        python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('[OK] demopy module imported successfully')"
 
         # Run the actual tests
         pytest tests/ -v
@@ -152,9 +152,9 @@ jobs:
         try:
             with open('$workflow', 'r') as f:
                 yaml.safe_load(f)
-            print('✅ $workflow is valid')
+            print('[OK] $workflow is valid')
         except Exception as e:
-            print('❌ $workflow is invalid: {e}')
+            print('[ERROR] $workflow is invalid: {e}')
             sys.exit(1)
         "
         done
@@ -170,13 +170,13 @@ jobs:
       run: |
         # Install cargo-audit if not already present
         if ! command -v cargo-audit &> /dev/null; then
-          echo "📦 Installing cargo-audit..."
+          echo "[INSTALL] Installing cargo-audit..."
           cargo install cargo-audit --locked || cargo install cargo-audit --locked --force
         else
-          echo "✅ cargo-audit already installed"
+          echo "[OK] cargo-audit already installed"
         fi
 
-        echo "🔒 Running security audit..."
+        echo "[SCAN] Running security audit..."
         cargo audit
       continue-on-error: true  # Don't fail the build on security advisories initially
     
@@ -245,10 +245,10 @@ jobs:
         pip install target/wheels/*.whl
         python -c "
         import demopy
-        print('✅ Package imports successfully')
+        print('[OK] Package imports successfully')
         print('Version:', demopy.__version__)
         print('Functions:', demopy.__all__)
-        
+
         # Test all functions
         print('hello():', demopy.hello())
         print('add(5, 7):', demopy.add(5, 7))
@@ -256,6 +256,6 @@ jobs:
         print('sum_list([1,2,3]):', demopy.sum_list([1,2,3]))
         print('reverse_string(\"test\"):', demopy.reverse_string('test'))
         print('power(2, 3):', demopy.power(2, 3))
-        print('✅ All functions work correctly')
+        print('[OK] All functions work correctly')
         "
       shell: bash

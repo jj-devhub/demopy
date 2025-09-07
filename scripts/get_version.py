@@ -14,18 +14,18 @@ from pathlib import Path
 def get_version():
     """Extract version from pyproject.toml."""
     pyproject_path = Path("pyproject.toml")
-    
+
     if not pyproject_path.exists():
         print("ERROR: pyproject.toml not found", file=sys.stderr)
         sys.exit(1)
-    
+
     try:
-        with open(pyproject_path, 'r') as f:
+        with open(pyproject_path, "r") as f:
             content = f.read()
-        
+
         # Search for version line
         match = re.search(r'version = "([^"]+)"', content)
-        
+
         if match:
             version = match.group(1)
             print(version)
@@ -33,7 +33,7 @@ def get_version():
         else:
             print("ERROR: Version not found in pyproject.toml", file=sys.stderr)
             sys.exit(1)
-            
+
     except Exception as e:
         print(f"ERROR: Failed to read pyproject.toml: {e}", file=sys.stderr)
         sys.exit(1)

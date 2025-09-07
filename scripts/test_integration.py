@@ -18,11 +18,7 @@ def run_command(cmd, description, check=True, capture_output=True):
     print(f"🔄 {description}...")
     try:
         result = subprocess.run(
-            cmd, 
-            shell=True, 
-            check=check, 
-            capture_output=capture_output, 
-            text=True
+            cmd, shell=True, check=check, capture_output=capture_output, text=True
         )
         if capture_output and result.stdout.strip():
             print(f"   Output: {result.stdout.strip()}")
@@ -39,11 +35,11 @@ def run_command(cmd, description, check=True, capture_output=True):
 
 def test_package_import():
     """Test that the package can be imported correctly."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📦 TESTING PACKAGE IMPORT")
-    print("="*60)
-    
-    test_script = '''
+    print("=" * 60)
+
+    test_script = """
 import sys
 print(f"Python version: {sys.version}")
 print(f"Python path: {sys.path[:3]}...")
@@ -77,19 +73,21 @@ except ImportError as e:
 except Exception as e:
     print(f"❌ Error during import test: {e}")
     sys.exit(1)
-'''
-    
-    success, _ = run_command(f'python -c "{test_script}"', "Test package import", check=False)
+"""
+
+    success, _ = run_command(
+        f'python -c "{test_script}"', "Test package import", check=False
+    )
     return success
 
 
 def test_functionality():
     """Test that all functions work correctly."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🧪 TESTING FUNCTIONALITY")
-    print("="*60)
-    
-    test_script = '''
+    print("=" * 60)
+
+    test_script = """
 import demopy
 
 print("Testing demopy functionality:")
@@ -150,67 +148,77 @@ else:
     print(f"❌ Some functionality tests failed with {implementation} implementation")
     import sys
     sys.exit(1)
-'''
-    
-    success, _ = run_command(f'python -c "{test_script}"', "Test functionality", check=False)
+"""
+
+    success, _ = run_command(
+        f'python -c "{test_script}"', "Test functionality", check=False
+    )
     return success
 
 
 def test_wheel_installation():
     """Test installing from a built wheel."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎡 TESTING WHEEL INSTALLATION")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Create a temporary directory for testing
     with tempfile.TemporaryDirectory() as temp_dir:
         print(f"Using temporary directory: {temp_dir}")
-        
+
         # Build wheel
-        success, output = run_command("maturin build --release", "Build wheel with maturin", check=False)
+        success, output = run_command(
+            "maturin build --release", "Build wheel with maturin", check=False
+        )
         if not success:
             print("❌ Failed to build wheel")
             return False
-        
+
         # Find the built wheel
         dist_dir = Path("target/wheels")
         if not dist_dir.exists():
             print("❌ Wheel directory not found")
             return False
-        
+
         wheels = list(dist_dir.glob("*.whl"))
         if not wheels:
             print("❌ No wheels found")
             return False
-        
+
         wheel_path = wheels[0]  # Use the first wheel found
         print(f"Found wheel: {wheel_path}")
-        
+
         # Install the wheel in a clean environment
         venv_dir = Path(temp_dir) / "test_venv"
-        
+
         # Create virtual environment
-        success, _ = run_command(f"python -m venv {venv_dir}", "Create test virtual environment", check=False)
+        success, _ = run_command(
+            f"python -m venv {venv_dir}", "Create test virtual environment", check=False
+        )
         if not success:
             print("❌ Failed to create virtual environment")
             return False
-        
+
         # Determine the correct python executable path
-        if os.name == 'nt':  # Windows
+        if os.name == "nt":  # Windows
             python_exe = venv_dir / "Scripts" / "python.exe"
             pip_exe = venv_dir / "Scripts" / "pip.exe"
         else:  # Unix-like
             python_exe = venv_dir / "bin" / "python"
             pip_exe = venv_dir / "bin" / "pip"
-        
+
         # Install the wheel
-        success, _ = run_command(f'"{pip_exe}" install "{wheel_path}"', "Install wheel in test environment", check=False)
+        success, _ = run_command(
+            f'"{pip_exe}" install "{wheel_path}"',
+            "Install wheel in test environment",
+            check=False,
+        )
         if not success:
             print("❌ Failed to install wheel")
             return False
-        
+
         # Test import in the clean environment
-        test_import_script = '''
+        test_import_script = """
 try:
     import demopy
     print("✅ Successfully imported demopy in clean environment")
@@ -226,23 +234,27 @@ except Exception as e:
     print(f"❌ Error in clean environment: {e}")
     import sys
     sys.exit(1)
-'''
-        
-        success, _ = run_command(f'"{python_exe}" -c "{test_import_script}"', "Test import in clean environment", check=False)
+"""
+
+        success, _ = run_command(
+            f'"{python_exe}" -c "{test_import_script}"',
+            "Test import in clean environment",
+            check=False,
+        )
         return success
 
 
 def test_fallback_behavior():
     """Test that fallback behavior works when Rust extension is not available."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🐍 TESTING PYTHON FALLBACK BEHAVIOR")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Test using PYTHONPATH to use fallback implementation
     python_path = str(Path.cwd() / "python")
-    env = {**os.environ, 'PYTHONPATH': python_path}
-    
-    fallback_test_script = '''
+    env = {**os.environ, "PYTHONPATH": python_path}
+
+    fallback_test_script = """
 import sys
 sys.path.insert(0, "python")
 
@@ -265,9 +277,11 @@ if "Python fallback" in hello_result:
     print("✅ Python fallback functionality test passed")
 else:
     print(f"⚠️  Expected Python fallback, got: {hello_result}")
-'''
-    
-    success, _ = run_command(f'python -c "{fallback_test_script}"', "Test Python fallback", check=False)
+"""
+
+    success, _ = run_command(
+        f'python -c "{fallback_test_script}"', "Test Python fallback", check=False
+    )
     return success
 
 
@@ -275,13 +289,15 @@ def main():
     """Main integration test function."""
     print("🧪 Integration Test for demopy_gb_jj")
     print("Testing both Rust extension and Python fallback implementations")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Check if we're in the right directory
     if not Path("pyproject.toml").exists():
-        print("❌ pyproject.toml not found. Please run this script from the project root.")
+        print(
+            "❌ pyproject.toml not found. Please run this script from the project root."
+        )
         return False
-    
+
     # Run integration tests
     tests = [
         ("Package Import", test_package_import),
@@ -289,7 +305,7 @@ def main():
         ("Wheel Installation", test_wheel_installation),
         ("Python Fallback", test_fallback_behavior),
     ]
-    
+
     results = {}
     for test_name, test_func in tests:
         try:
@@ -297,19 +313,19 @@ def main():
         except Exception as e:
             print(f"❌ {test_name} failed with exception: {e}")
             results[test_name] = False
-    
+
     # Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 INTEGRATION TEST SUMMARY")
-    print("="*60)
-    
+    print("=" * 60)
+
     all_passed = True
     for test_name, passed in results.items():
         status = "✅ PASSED" if passed else "❌ FAILED"
         print(f"{status} {test_name}")
         if not passed:
             all_passed = False
-    
+
     if all_passed:
         print("\n🎉 ALL INTEGRATION TESTS PASSED!")
         print("✅ Package builds and installs correctly")
@@ -319,7 +335,7 @@ def main():
     else:
         print("\n⚠️  SOME INTEGRATION TESTS FAILED")
         print("❌ Review the issues above before deploying")
-    
+
     return all_passed
 
 
