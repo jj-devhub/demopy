@@ -8,7 +8,6 @@ enforcement in the demopy_gb_jj Rust-Python extension project.
 
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 
@@ -93,6 +92,13 @@ def install_hooks():
     if not success:
         return False
 
+    # Verify hooks are installed
+    if Path(".git/hooks/pre-commit").exists():
+        print("✅ Pre-commit hook installed in .git/hooks/pre-commit")
+    else:
+        print("❌ Pre-commit hook not found in .git/hooks/")
+        return False
+
     # Install commit message hooks (optional)
     success, _ = run_command(
         "pre-commit install --hook-type commit-msg",
@@ -159,10 +165,11 @@ def show_usage_info():
     print(
         """
 🎯 How Pre-commit Hooks Work:
-   • Hooks run automatically before each git commit
-   • They check and auto-fix code quality issues
-   • Commits are blocked if critical issues are found
+   • Hooks run AUTOMATICALLY on every 'git commit' command
+   • NO manual intervention required - they execute automatically
+   • Quality gate enforcement: commits are BLOCKED if checks fail
    • Auto-fixable issues (formatting) are corrected automatically
+   • Developers must fix remaining issues before commit proceeds
 
 🛠️  Available Hooks:
    • Black: Auto-formats Python code (88 char line length)
@@ -179,11 +186,14 @@ def show_usage_info():
    • scripts/ - Utility scripts
    • src/ - Rust source code (for Rust hooks)
 
-🚀 Common Commands:
-   • git commit -m "message"  # Runs hooks automatically
-   • pre-commit run --all-files  # Run hooks on all files
-   • pre-commit run <hook-id>  # Run specific hook
-   • pre-commit skip  # Skip hooks for one commit (not recommended)
+🚀 Automatic Execution:
+   • git commit -m "message"  # Hooks run AUTOMATICALLY (no manual action needed)
+   • git commit --no-verify   # Skip hooks (emergency only, not recommended)
+
+🔧 Manual Testing (Optional):
+   • pre-commit run --all-files  # Test hooks on all files manually
+   • pre-commit run <hook-id>    # Test specific hook manually
+   • pre-commit run --files <file>  # Test hooks on specific files
 
 ⚙️  Configuration Files:
    • .pre-commit-config.yaml - Hook configuration
