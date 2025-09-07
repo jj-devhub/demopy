@@ -24,7 +24,9 @@ class TestBasicFunctionality:
         assert isinstance(result, str)
         assert "demopy_gb_jj" in result
         # Should contain either "Rust edition" or "Python fallback"
-        assert any(phrase in result for phrase in ["Rust edition", "Python fallback"])
+        assert any(
+            phrase in result for phrase in ["Rust edition", "Python fallback"]
+        )
 
     def test_add(self):
         """Test the add function."""

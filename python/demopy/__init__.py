@@ -8,7 +8,8 @@ __version__ = "0.4.0"
 
 try:
     # Import the Rust extension
-    # When installed via maturin, the Rust module will be available as demopy._rust
+    # When installed via maturin, the Rust module will be available as
+    # demopy._rust
     from demopy._rust import add
     from demopy._rust import hello as _rust_hello
     from demopy._rust import multiply, power, reverse_string, sum_list
@@ -52,7 +53,7 @@ except ImportError:
         return s[::-1]
 
     def power(base, exponent):
-        """Calculate the power of a number (base^exponent) (pure Python fallback)."""
+        """Calculate power of a number (base^exponent) (Python fallback)."""
         return base**exponent
 
     __all__ = [
