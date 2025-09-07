@@ -1,6 +1,6 @@
 [package]
 name = "demopy_gb_jj"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
 description = "A demo PyPI package with Rust extensions"
 authors = ["jj-devhub <Jaid.jashim@infinitibit.com>"]
