@@ -71,27 +71,35 @@ jobs:
         # Get commits since last tag
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
         if [ -z "$LAST_TAG" ]; then
+          echo "No previous tags found, analyzing all commits"
           COMMITS=$(git log --oneline)
         else
+          echo "Last tag: $LAST_TAG"
           COMMITS=$(git log ${LAST_TAG}..HEAD --oneline)
         fi
-        
+
         echo "Analyzing commits since $LAST_TAG:"
         echo "$COMMITS"
+        echo "Number of commits to analyze: $(echo "$COMMITS" | wc -l)"
         
         # Determine version bump type based on commit messages
         VERSION_TYPE="none"
-        
+
         # Check for breaking changes (major version)
         if echo "$COMMITS" | grep -qiE "(BREAKING CHANGE|breaking:|major:)"; then
           VERSION_TYPE="major"
+          echo "Found breaking change commits - will bump major version"
         # Check for new features (minor version)
         elif echo "$COMMITS" | grep -qiE "(feat:|feature:|minor:)"; then
           VERSION_TYPE="minor"
+          echo "Found feature commits - will bump minor version"
         # Check for bug fixes and other changes (patch version)
         elif echo "$COMMITS" | grep -qiE "(fix:|patch:|chore:|docs:|style:|refactor:|perf:|test:)"; then
           VERSION_TYPE="patch"
+          echo "Found fix/maintenance commits - will bump patch version"
         fi
+
+        echo "Determined version bump type: $VERSION_TYPE"
         
         # Skip release if no relevant changes
         if [ "$VERSION_TYPE" = "none" ]; then
@@ -107,16 +115,21 @@ jobs:
         echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
         
         # Calculate new version
+        echo "Running: python scripts/bump_version.py $VERSION_TYPE"
         python scripts/bump_version.py $VERSION_TYPE
         NEW_VERSION=$(python scripts/get_version.py)
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
         echo "New version will be: $NEW_VERSION"
+
+        # Show what files were changed
+        echo "Files changed by version bump:"
+        git status --porcelain
     
     - name: Commit version changes
       if: steps.version_check.outputs.should_release == 'true'
       run: |
-        # Check if there are changes to commit
-        if git diff --staged --quiet; then
+        # Check if there are changes to commit (check working directory, not staged)
+        if git diff --quiet; then
           echo "No changes to commit"
         else
           echo "Committing version changes..."

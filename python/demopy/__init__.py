@@ -4,7 +4,7 @@ demopy_gb_jj - A demo PyPI package with Rust extensions
 This package demonstrates how to create Python extensions using Rust and PyO3.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 try:
     # Import the Rust extension
