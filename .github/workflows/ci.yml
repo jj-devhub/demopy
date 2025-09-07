@@ -105,6 +105,8 @@ jobs:
     
     - name: Debug and verify Rust toolchain
       shell: bash
+      env:
+        PYTHONIOENCODING: utf-8
       run: |
         echo "=== RUST TOOLCHAIN DEBUG ==="
         echo "Operating System: $RUNNER_OS"
@@ -122,20 +124,20 @@ jobs:
           "$(which cargo 2>/dev/null || echo 'not found')"
         do
           if command -v "$path" &> /dev/null; then
-            echo "✅ Found cargo at: $path"
+            echo "[OK] Found cargo at: $path"
             "$path" --version
             break
           else
-            echo "❌ Not found: $path"
+            echo "[FAIL] Not found: $path"
           fi
         done
 
         echo "=== FINAL VERIFICATION ==="
         if command -v cargo &> /dev/null; then
-          echo "✅ Cargo is available"
+          echo "[OK] Cargo is available"
           cargo --version
         else
-          echo "❌ Cargo is NOT available"
+          echo "[ERROR] Cargo is NOT available"
           echo "Available commands:"
           compgen -c | grep -i rust || echo "No rust-related commands found"
           exit 1
