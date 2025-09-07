@@ -171,6 +171,8 @@ jobs:
 
     - name: Build Python extension
       shell: bash
+      env:
+        PYTHONIOENCODING: utf-8
       run: |
         source venv/bin/activate || source venv/Scripts/activate
         echo "Building Rust extension with maturin..."
@@ -180,29 +182,33 @@ jobs:
         python -c "
         try:
             import demopy
-            print('✅ Successfully imported demopy')
+            print('[OK] Successfully imported demopy')
             print(f'Version: {demopy.__version__}')
             hello_result = demopy.hello()
             print(f'Hello: {hello_result}')
             if 'Rust edition' in hello_result:
-                print('✅ Using Rust extension')
+                print('[OK] Using Rust extension')
             elif 'Python fallback' in hello_result:
-                print('✅ Using Python fallback')
+                print('[OK] Using Python fallback')
             else:
-                print(f'⚠️  Unknown implementation: {hello_result}')
+                print(f'[WARN] Unknown implementation: {hello_result}')
         except Exception as e:
-            print(f'❌ Import failed: {e}')
+            print(f'[ERROR] Import failed: {e}')
             raise
         "
 
     - name: Run Python tests
       shell: bash
+      env:
+        PYTHONIOENCODING: utf-8
       run: |
         source venv/bin/activate || source venv/Scripts/activate
         pytest tests/ -v
     
     - name: Test pure Python fallback
       shell: bash
+      env:
+        PYTHONIOENCODING: utf-8
       run: |
         source venv/bin/activate || source venv/Scripts/activate
         # Test that fallback works when Rust extension is not available
@@ -227,11 +233,13 @@ jobs:
         assert demopy.sum_list([1, 2, 3]) == 6
         assert demopy.reverse_string('hello') == 'olleh'
         assert demopy.power(2, 3) == 8
-        print('✅ Pure Python fallback test passed!')
+        print('[OK] Pure Python fallback test passed!')
         "
 
     - name: Run integration tests
       shell: bash
+      env:
+        PYTHONIOENCODING: utf-8
       run: |
         source venv/bin/activate || source venv/Scripts/activate
         python scripts/test_integration.py
