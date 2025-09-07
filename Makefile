@@ -197,3 +197,25 @@ validate-python:
 test-python-fallback:
 	@echo "🐍 Testing Python fallback implementation..."
 	PYTHONPATH=python python -c "import demopy; print('Version:', demopy.__version__); print('Hello:', demopy.hello())"
+
+# Pre-commit hooks management
+setup-hooks:
+	@echo "🪝 Setting up pre-commit hooks..."
+	python scripts/setup_pre_commit.py
+
+install-hooks:
+	@echo "📦 Installing pre-commit hooks..."
+	pip install pre-commit
+	pre-commit install
+
+update-hooks:
+	@echo "🔄 Updating pre-commit hooks..."
+	pre-commit autoupdate
+
+run-hooks:
+	@echo "🧪 Running pre-commit hooks on all files..."
+	pre-commit run --all-files
+
+skip-hooks:
+	@echo "⚠️  Skipping pre-commit hooks for next commit..."
+	@echo "Use: git commit --no-verify -m 'your message'"
