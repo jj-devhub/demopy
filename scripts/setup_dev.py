@@ -12,9 +12,9 @@ Usage:
     python scripts/setup_dev.py
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 

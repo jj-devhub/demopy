@@ -28,7 +28,7 @@ jobs:
       version_type: ${{ steps.version_check.outputs.version_type }}
       new_version: ${{ steps.version_check.outputs.new_version }}
       current_version: ${{ steps.version_check.outputs.current_version }}
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -36,12 +36,12 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         # Ensure the token can push to protected branches
         persist-credentials: true
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    
+
     - name: Configure Git
       run: |
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -59,7 +59,7 @@ jobs:
 
     - name: Run Rust linting
       run: cargo clippy --all-targets --all-features -- -D warnings
-    
+
     - name: Analyze commits and determine version bump
       id: version_check
       run: |
@@ -67,7 +67,7 @@ jobs:
         CURRENT_VERSION=$(python scripts/get_version.py)
         echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
         echo "Current version: $CURRENT_VERSION"
-        
+
         # Get commits since last tag
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
         if [ -z "$LAST_TAG" ]; then
@@ -81,7 +81,7 @@ jobs:
         echo "Analyzing commits since $LAST_TAG:"
         echo "$COMMITS"
         echo "Number of commits to analyze: $(echo "$COMMITS" | wc -l)"
-        
+
         # Determine version bump type based on commit messages
         VERSION_TYPE="none"
 
@@ -100,7 +100,7 @@ jobs:
         fi
 
         echo "Determined version bump type: $VERSION_TYPE"
-        
+
         # Skip release if no relevant changes
         if [ "$VERSION_TYPE" = "none" ]; then
           echo "No version-relevant changes detected. Skipping release."
@@ -109,11 +109,11 @@ jobs:
           echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         echo "Determined version bump type: $VERSION_TYPE"
         echo "should_release=true" >> $GITHUB_OUTPUT
         echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
-        
+
         # Calculate new version
         echo "Running: python scripts/bump_version.py $VERSION_TYPE"
         python scripts/bump_version.py $VERSION_TYPE
@@ -124,7 +124,7 @@ jobs:
         # Show what files were changed
         echo "Files changed by version bump:"
         git status --porcelain
-    
+
     - name: Commit version changes
       if: steps.version_check.outputs.should_release == 'true'
       run: |
@@ -152,7 +152,7 @@ jobs:
             fi
           done
         fi
-    
+
     - name: Create and push tag
       if: steps.version_check.outputs.should_release == 'true'
       run: |
@@ -190,12 +190,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
         ref: v${{ needs.analyze-and-version.outputs.new_version }}
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -214,10 +214,10 @@ jobs:
 
     - name: Install maturin
       run: pip install maturin
-    
+
     - name: Build wheels
       run: maturin build --release --out dist --find-interpreter
-    
+
     - name: Upload wheels
       uses: actions/upload-artifact@v4
       with:
@@ -228,23 +228,23 @@ jobs:
     needs: analyze-and-version
     if: needs.analyze-and-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
         ref: v${{ needs.analyze-and-version.outputs.new_version }}
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    
+
     - name: Install maturin
       run: pip install maturin
-    
+
     - name: Build source distribution
       run: maturin sdist --out dist
-    
+
     - name: Upload sdist
       uses: actions/upload-artifact@v4
       with:
@@ -256,26 +256,26 @@ jobs:
     if: needs.analyze-and-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     environment: release
-    
+
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
         path: dist-artifacts
-    
+
     - name: Flatten artifacts
       run: |
         mkdir -p dist
         find dist-artifacts -name "*.whl" -exec cp {} dist/ \;
         find dist-artifacts -name "*.tar.gz" -exec cp {} dist/ \;
         ls -la dist/
-    
+
     - name: Check if version already exists on PyPI
       id: check_version
       run: |
         VERSION=${{ needs.analyze-and-version.outputs.new_version }}
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-        
+
         if pip index versions demopy_gb_jj 2>/dev/null | grep -q "$VERSION"; then
           echo "exists=true" >> $GITHUB_OUTPUT
           echo "[WARN] Version $VERSION already exists on PyPI"
@@ -283,7 +283,7 @@ jobs:
           echo "exists=false" >> $GITHUB_OUTPUT
           echo "[OK] Version $VERSION is new, proceeding with upload"
         fi
-    
+
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
@@ -296,37 +296,37 @@ jobs:
     needs: [analyze-and-version, publish]
     if: needs.analyze-and-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: v${{ needs.analyze-and-version.outputs.new_version }}
-    
+
     - name: Generate changelog
       id: changelog
       run: |
         # Get the previous tag
         CURRENT_TAG="v${{ needs.analyze-and-version.outputs.new_version }}"
         PREVIOUS_TAG=$(git describe --tags --abbrev=0 $CURRENT_TAG^ 2>/dev/null || echo "")
-        
+
         echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG"
-        
+
         # Generate changelog content
         CHANGELOG="## What's Changed\n\n"
-        
+
         if [ -z "$PREVIOUS_TAG" ]; then
           COMMITS=$(git log --oneline --pretty=format:"* %s (%h)" $CURRENT_TAG)
         else
           COMMITS=$(git log --oneline --pretty=format:"* %s (%h)" ${PREVIOUS_TAG}..${CURRENT_TAG})
         fi
-        
+
         # Categorize commits
         FEATURES=$(echo "$COMMITS" | grep -iE "(feat:|feature:)" || true)
         FIXES=$(echo "$COMMITS" | grep -iE "(fix:|patch:)" || true)
         CHORES=$(echo "$COMMITS" | grep -iE "(chore:|docs:|style:|refactor:|perf:|test:)" || true)
         BREAKING=$(echo "$COMMITS" | grep -iE "(BREAKING CHANGE|breaking:|major:)" || true)
-        
+
         if [ ! -z "$BREAKING" ]; then
           CHANGELOG="${CHANGELOG}### Breaking Changes\n${BREAKING}\n\n"
         fi
@@ -356,13 +356,13 @@ jobs:
         CHANGELOG="${CHANGELOG}print(demopy.hello())  # Hello from demopy_gb_jj!\n"
         CHANGELOG="${CHANGELOG}print(demopy.add(5, 7))  # 12\n"
         CHANGELOG="${CHANGELOG}\`\`\`\n"
-        
+
         # Save changelog to file and output
         echo -e "$CHANGELOG" > changelog.md
         echo "changelog<<EOF" >> $GITHUB_OUTPUT
         echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
-    
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:

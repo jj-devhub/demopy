@@ -7,9 +7,8 @@ and that both the Rust extension and Python fallback can be imported
 and tested properly.
 """
 
-import sys
-import os
 import subprocess
+import sys
 from pathlib import Path
 
 

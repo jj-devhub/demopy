@@ -6,10 +6,10 @@ This script tests both the Rust extension and Python fallback implementations
 to ensure they work correctly after installation.
 """
 
-import sys
-import subprocess
-import tempfile
 import os
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 
@@ -49,24 +49,24 @@ try:
     print("✅ Successfully imported demopy")
     print(f"Package version: {demopy.__version__}")
     print(f"Available functions: {demopy.__all__}")
-    
+
     # Test that all expected functions are available
     expected_functions = ["hello", "add", "multiply", "sum_list", "reverse_string", "power"]
     missing_functions = []
-    
+
     for func_name in expected_functions:
         if hasattr(demopy, func_name):
             print(f"✅ {func_name} is available")
         else:
             print(f"❌ {func_name} is missing")
             missing_functions.append(func_name)
-    
+
     if missing_functions:
         print(f"❌ Missing functions: {missing_functions}")
         sys.exit(1)
     else:
         print("✅ All expected functions are available")
-        
+
 except ImportError as e:
     print(f"❌ Failed to import demopy: {e}")
     sys.exit(1)
@@ -123,7 +123,7 @@ for func_name, args, expected in test_cases:
     try:
         func = getattr(demopy, func_name)
         result = func(*args)
-        
+
         # Handle floating point comparisons
         if isinstance(expected, float):
             if abs(result - expected) < 1e-10:
@@ -137,7 +137,7 @@ for func_name, args, expected in test_cases:
             else:
                 print(f"❌ {func_name}{tuple(args)} = {result}, expected {expected}")
                 all_passed = False
-                
+
     except Exception as e:
         print(f"❌ {func_name}{tuple(args)} failed: {e}")
         all_passed = False
@@ -224,11 +224,11 @@ try:
     print("✅ Successfully imported demopy in clean environment")
     print(f"Version: {demopy.__version__}")
     print(f"Hello: {demopy.hello()}")
-    
+
     # Test a few functions
     print(f"add(2, 3) = {demopy.add(2, 3)}")
     print(f"power(2, 3) = {demopy.power(2, 3)}")
-    
+
     print("✅ Wheel installation test passed")
 except Exception as e:
     print(f"❌ Error in clean environment: {e}")
@@ -251,8 +251,6 @@ def test_fallback_behavior():
     print("=" * 60)
 
     # Test using PYTHONPATH to use fallback implementation
-    python_path = str(Path.cwd() / "python")
-    env = {**os.environ, "PYTHONPATH": python_path}
 
     fallback_test_script = """
 import sys
@@ -266,14 +264,14 @@ print(f"Fallback hello(): {hello_result}")
 
 if "Python fallback" in hello_result:
     print("✅ Successfully using Python fallback implementation")
-    
+
     # Test fallback functions
     print(f"add(10, 20) = {demopy.add(10, 20)}")
     print(f"multiply(3.5, 2.0) = {demopy.multiply(3.5, 2.0)}")
     print(f"sum_list([1, 2, 3]) = {demopy.sum_list([1, 2, 3])}")
     print(f"reverse_string('test') = {demopy.reverse_string('test')}")
     print(f"power(3, 2) = {demopy.power(3, 2)}")
-    
+
     print("✅ Python fallback functionality test passed")
 else:
     print(f"⚠️  Expected Python fallback, got: {hello_result}")

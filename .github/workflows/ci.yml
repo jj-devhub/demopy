@@ -14,10 +14,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
@@ -78,7 +78,7 @@ jobs:
           echo "/c/Users/runneradmin/.cargo/bin" >> $GITHUB_PATH
           echo "Added Windows cargo path to PATH"
         fi
-    
+
     - name: Cache Rust dependencies
       uses: actions/cache@v4
       with:
@@ -89,7 +89,7 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
           ${{ runner.os }}-cargo-
-    
+
     - name: Create virtual environment
       run: |
         python -m venv venv
@@ -102,7 +102,7 @@ jobs:
         pip install maturin pytest
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
         echo "PATH=$PATH" >> $GITHUB_ENV
-    
+
     - name: Debug and verify Rust toolchain
       shell: bash
       env:
@@ -206,7 +206,7 @@ jobs:
       run: |
         source venv/bin/activate || source venv/Scripts/activate
         pytest tests/ -v
-    
+
     - name: Test pure Python fallback
       shell: bash
       env:

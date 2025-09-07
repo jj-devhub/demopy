@@ -6,10 +6,9 @@ This script helps diagnose and troubleshoot GitHub Actions permission issues
 that prevent the automated CI/CD pipeline from pushing commits and tags.
 """
 
+import os
 import subprocess
 import sys
-import os
-import json
 from pathlib import Path
 
 
@@ -68,7 +67,7 @@ def check_github_token_permissions():
 
     # Try to make a GitHub API call to check permissions
     try:
-        import requests
+        import requests  # type: ignore
 
         headers = {
             "Authorization": f"token {github_token}",
@@ -117,7 +116,7 @@ def check_workflow_permissions():
         return False
 
     try:
-        import yaml
+        import yaml  # type: ignore
 
         with open(workflow_file, "r") as f:
             workflow_data = yaml.safe_load(f)

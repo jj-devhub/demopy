@@ -6,11 +6,9 @@ This script manages the installation of Rust tools in a way that handles
 existing installations gracefully and provides proper error handling.
 """
 
+import os
 import subprocess
 import sys
-import os
-import json
-from pathlib import Path
 
 
 def run_command(cmd, description, check=True, capture_output=True):

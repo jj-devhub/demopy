@@ -14,10 +14,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -25,13 +25,13 @@ jobs:
 
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
-    
+
     - name: Install maturin
       run: pip install maturin
-    
+
     - name: Build wheels
       run: maturin build --release --out dist --find-interpreter
-    
+
     - name: Upload wheels
       uses: actions/upload-artifact@v4
       with:
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -50,13 +50,13 @@ jobs:
 
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
-    
+
     - name: Install maturin
       run: pip install maturin
-    
+
     - name: Build sdist
       run: maturin sdist --out dist
-    
+
     - name: Upload sdist
       uses: actions/upload-artifact@v4
       with:
@@ -69,13 +69,13 @@ jobs:
     environment: release
     permissions:
       id-token: write  # For trusted publishing to PyPI
-    
+
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
         path: dist-artifacts
-    
+
     - name: Flatten artifacts
       run: |
         mkdir -p dist
@@ -98,7 +98,7 @@ jobs:
           echo "exists=false" >> $GITHUB_OUTPUT
           echo "✅ Version $VERSION is new, proceeding with upload"
         fi
-    
+
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
@@ -115,12 +115,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    
+
     - name: Generate changelog
       id: changelog
       run: |

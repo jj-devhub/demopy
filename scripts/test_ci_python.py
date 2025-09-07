@@ -6,9 +6,9 @@ This script simulates exactly what the GitHub Actions Code Quality workflow
 will do for Python testing, allowing local validation before pushing.
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 
@@ -189,7 +189,7 @@ for func_name, args, expected in functions_to_test:
     try:
         func = getattr(demopy, func_name)
         result = func(*args)
-        
+
         if func_name == 'hello':
             # Just check that it contains expected text
             if expected in result:

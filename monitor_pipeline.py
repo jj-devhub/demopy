@@ -18,10 +18,10 @@ def print_pipeline_status():
     print(f"📝 Commit message: feat: add power function for exponentiation calculations")
     print(f"🔄 Expected version bump: MINOR (0.5.0 → 0.6.0)")
     print()
-    
+
     print("📋 EXPECTED PIPELINE STAGES:")
     print("-" * 40)
-    
+
     stages = [
         ("🔍 analyze-and-version", [
             "Analyze commit messages since last tag",
@@ -54,12 +54,12 @@ def print_pipeline_status():
             "Include installation and usage instructions"
         ])
     ]
-    
+
     for stage_name, steps in stages:
         print(f"\n{stage_name}")
         for step in steps:
             print(f"  • {step}")
-    
+
     print("\n" + "="*60)
     print("🔗 MONITORING LINKS:")
     print("="*60)
@@ -67,7 +67,7 @@ def print_pipeline_status():
     print("📦 PyPI Package: https://pypi.org/project/demopy-gb-jj/")
     print("🏷️ GitHub Releases: https://github.com/jj-devhub/demopy/releases")
     print()
-    
+
     print("✅ SUCCESS INDICATORS TO LOOK FOR:")
     print("-" * 40)
     success_indicators = [
@@ -78,10 +78,10 @@ def print_pipeline_status():
         "GitHub release v0.6.0 with power function in changelog",
         "All 18 CI matrix jobs pass (3 OS × 6 Python versions)"
     ]
-    
+
     for indicator in success_indicators:
         print(f"  ✅ {indicator}")
-    
+
     print("\n❌ POTENTIAL ISSUES TO WATCH FOR:")
     print("-" * 40)
     potential_issues = [
@@ -91,10 +91,10 @@ def print_pipeline_status():
         "Wheel building failures for any Python version",
         "GitHub release creation failures"
     ]
-    
+
     for issue in potential_issues:
         print(f"  ❌ {issue}")
-    
+
     print("\n" + "="*60)
     print("🧪 EXPECTED CHANGELOG CONTENT:")
     print("="*60)
@@ -119,7 +119,7 @@ print(demopy.add(5, 7))  # 12
 print(demopy.power(2, 3))  # 8 (NEW!)
 ```
 """)
-    
+
     print("="*60)
     print("⏳ ESTIMATED TIMELINE:")
     print("="*60)
@@ -131,10 +131,10 @@ print(demopy.power(2, 3))  # 8 (NEW!)
         ("19-21 min", "GitHub release creation"),
         ("21+ min", "Pipeline complete ✅")
     ]
-    
+
     for time_range, activity in timeline:
         print(f"  {time_range}: {activity}")
-    
+
     print("\n🎯 NEXT STEPS AFTER PIPELINE COMPLETES:")
     print("="*60)
     next_steps = [
@@ -144,10 +144,10 @@ print(demopy.power(2, 3))  # 8 (NEW!)
         "Validate cross-platform compatibility",
         "Confirm automated versioning worked correctly"
     ]
-    
+
     for i, step in enumerate(next_steps, 1):
         print(f"  {i}. {step}")
-    
+
     print(f"\n🚀 Pipeline monitoring started at {datetime.now().strftime('%H:%M:%S')}")
     print("Monitor the GitHub Actions page for real-time progress!")
 

@@ -1,5 +1,5 @@
 # Makefile for demopy_gb_jj development
-# 
+#
 # Common commands:
 #   make setup     - Set up development environment
 #   make format    - Format all code (Rust + Python)
@@ -132,7 +132,7 @@ release-check: check security
 	@echo "✅ Ready for release!"
 
 # CI simulation (run what CI runs)
-ci: 
+ci:
 	@echo "🤖 Simulating CI pipeline..."
 	@echo "1️⃣ Code formatting check..."
 	cargo fmt --all -- --check

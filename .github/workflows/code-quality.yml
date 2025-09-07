@@ -13,15 +13,15 @@ jobs:
   rust-quality:
     name: Rust Code Quality
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
       with:
         components: rustfmt, clippy
-    
+
     - name: Cache Rust dependencies
       uses: actions/cache@v4
       with:
@@ -41,16 +41,16 @@ jobs:
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/workflows/code-quality.yml') }}
         restore-keys: |
           ${{ runner.os }}-cargo-tools-
-    
+
     - name: Check Rust formatting
       run: cargo fmt --all -- --check
-    
+
     - name: Run Rust linting (Clippy)
       run: cargo clippy --all-targets --all-features -- -D warnings
-    
+
     - name: Run Rust tests
       run: cargo test --verbose
-    
+
     - name: Install Rust tools
       run: |
         echo "[SETUP] Installing Rust tools for CI..."
@@ -64,15 +64,15 @@ jobs:
   python-quality:
     name: Python Code Quality
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    
+
     - name: Cache Python dependencies
       uses: actions/cache@v4
       with:
@@ -80,7 +80,7 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -95,20 +95,20 @@ jobs:
         # Validate that the package can be imported
         python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('[OK] demopy module imported successfully')"
         python -c "import sys; sys.path.insert(0, 'python'); import demopy; print('Package version:', demopy.__version__)"
-    
+
     - name: Check Python formatting (Black)
       run: black --check --diff python/ tests/
-    
+
     - name: Check Python import sorting (isort)
       run: isort --check-only --diff python/ tests/
-    
+
     - name: Run Python linting (Flake8)
       run: flake8 python/ tests/
-    
+
     - name: Run Python type checking (MyPy)
       run: mypy python/demopy/ --ignore-missing-imports
       continue-on-error: true  # MyPy can be strict, make it non-blocking initially
-    
+
     - name: Run Python tests
       run: |
         # Ensure Python can find the demopy module
@@ -124,23 +124,23 @@ jobs:
   yaml-quality:
     name: YAML and Config Quality
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    
+
     - name: Install YAML linter
       run: pip install yamllint
-    
+
     - name: Check YAML files
       run: |
         yamllint .github/workflows/ || true
         yamllint .pre-commit-config.yaml || true
-    
+
     - name: Validate GitHub Actions workflows
       run: |
         # Check workflow syntax
@@ -162,10 +162,10 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Install and run Rust security audit
       run: |
         # Install cargo-audit if not already present
@@ -179,12 +179,12 @@ jobs:
         echo "[SCAN] Running security audit..."
         cargo audit
       continue-on-error: true  # Don't fail the build on security advisories initially
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    
+
     - name: Run Python security scan
       run: |
         pip install safety bandit
@@ -197,10 +197,10 @@ jobs:
   documentation:
     name: Documentation Quality
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Check Markdown files
       run: |
         # Install markdownlint
@@ -208,7 +208,7 @@ jobs:
         # Check markdown files (non-blocking initially)
         markdownlint *.md || true
         markdownlint docs/ || true
-    
+
     - name: Check for broken links
       run: |
         # Install link checker
@@ -224,21 +224,21 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
-    
+
     - name: Install maturin
       run: pip install maturin
-    
+
     - name: Build and test package
       run: |
         maturin build --release

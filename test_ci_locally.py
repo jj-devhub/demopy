@@ -18,10 +18,10 @@ def run_command(cmd, description, cwd=None, shell=True):
     print(f"🔄 {description}...")
     try:
         result = subprocess.run(
-            cmd, 
-            shell=shell, 
-            check=True, 
-            capture_output=True, 
+            cmd,
+            shell=shell,
+            check=True,
+            capture_output=True,
             text=True,
             cwd=cwd
         )
@@ -42,26 +42,26 @@ def test_rust_components():
     print("\n" + "="*50)
     print("🦀 TESTING RUST COMPONENTS")
     print("="*50)
-    
+
     # Test Rust compilation
     success, _ = run_command("cargo check", "Rust compilation check")
     if not success:
         return False
-    
+
     # Test Rust tests
     success, _ = run_command("cargo test", "Rust unit tests")
     if not success:
         return False
-    
+
     # Test Rust linting
     success, _ = run_command("cargo fmt --all -- --check", "Rust formatting check")
     if not success:
         print("⚠️  Rust formatting issues found. Run 'cargo fmt' to fix.")
-    
+
     success, _ = run_command("cargo clippy -- -D warnings", "Rust linting")
     if not success:
         print("⚠️  Rust linting issues found.")
-    
+
     return True
 
 
@@ -70,19 +70,19 @@ def test_python_components():
     print("\n" + "="*50)
     print("🐍 TESTING PYTHON COMPONENTS")
     print("="*50)
-    
+
     # Create temporary virtual environment
     with tempfile.TemporaryDirectory() as temp_dir:
         venv_path = Path(temp_dir) / "test_venv"
-        
+
         # Create virtual environment
         success, _ = run_command(
-            f"python -m venv {venv_path}", 
+            f"python -m venv {venv_path}",
             "Create virtual environment"
         )
         if not success:
             return False
-        
+
         # Determine activation script path
         if os.name == 'nt':  # Windows
             activate_script = venv_path / "Scripts" / "activate.bat"
@@ -92,7 +92,7 @@ def test_python_components():
             activate_script = venv_path / "bin" / "activate"
             pip_path = venv_path / "bin" / "pip"
             python_path = venv_path / "bin" / "python"
-        
+
         # Install dependencies in virtual environment
         success, _ = run_command(
             f"{pip_path} install --upgrade pip",
@@ -100,14 +100,14 @@ def test_python_components():
         )
         if not success:
             return False
-        
+
         success, _ = run_command(
             f"{pip_path} install maturin pytest",
             "Install dependencies in venv"
         )
         if not success:
             return False
-        
+
         # Build Python extension
         success, _ = run_command(
             f"{python_path} -m maturin develop",
@@ -116,7 +116,7 @@ def test_python_components():
         if not success:
             print("⚠️  Maturin develop failed. This might be expected in some environments.")
             # Continue with fallback testing
-        
+
         # Test Python tests
         success, _ = run_command(
             f"{python_path} -m pytest tests/ -v",
@@ -124,7 +124,7 @@ def test_python_components():
         )
         if not success:
             return False
-        
+
         # Test Python fallback
         fallback_test = '''
 import sys
@@ -142,14 +142,14 @@ assert "Python fallback" in demopy.hello()
 assert demopy.add(2, 3) == 5
 print("Pure Python fallback test passed!")
 '''
-        
+
         success, _ = run_command(
             f'{python_path} -c "{fallback_test}"',
             "Test Python fallback mechanism"
         )
         if not success:
             return False
-    
+
     return True
 
 
@@ -158,13 +158,13 @@ def test_workflow_syntax():
     print("\n" + "="*50)
     print("⚙️  TESTING WORKFLOW SYNTAX")
     print("="*50)
-    
+
     workflow_files = [
         ".github/workflows/ci.yml",
-        ".github/workflows/release.yml", 
+        ".github/workflows/release.yml",
         ".github/workflows/version-bump.yml"
     ]
-    
+
     for workflow_file in workflow_files:
         if Path(workflow_file).exists():
             # Basic YAML syntax check
@@ -180,7 +180,7 @@ def test_workflow_syntax():
                 return False
         else:
             print(f"⚠️  {workflow_file} not found")
-    
+
     return True
 
 
@@ -189,19 +189,19 @@ def main():
     print("🚀 Starting Local CI Testing")
     print("This script simulates the GitHub Actions CI workflow locally")
     print("="*60)
-    
+
     # Check if we're in the right directory
     if not Path("Cargo.toml").exists():
         print("❌ Cargo.toml not found. Please run this script from the project root.")
         return False
-    
+
     # Test components
     tests = [
         ("Workflow Syntax", test_workflow_syntax),
         ("Rust Components", test_rust_components),
         ("Python Components", test_python_components),
     ]
-    
+
     results = {}
     for test_name, test_func in tests:
         try:
@@ -209,19 +209,19 @@ def main():
         except Exception as e:
             print(f"❌ {test_name} failed with exception: {e}")
             results[test_name] = False
-    
+
     # Summary
     print("\n" + "="*60)
     print("📊 TEST SUMMARY")
     print("="*60)
-    
+
     all_passed = True
     for test_name, passed in results.items():
         status = "✅ PASSED" if passed else "❌ FAILED"
         print(f"{test_name}: {status}")
         if not passed:
             all_passed = False
-    
+
     if all_passed:
         print("\n🎉 ALL TESTS PASSED!")
         print("✅ Ready to push to GitHub")
@@ -230,7 +230,7 @@ def main():
         print("\n⚠️  SOME TESTS FAILED")
         print("❌ Fix issues before pushing to GitHub")
         print("❌ CI workflow may fail")
-    
+
     return all_passed
 
 

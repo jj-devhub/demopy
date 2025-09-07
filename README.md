@@ -1,6 +1,7 @@
 # demopy_gb_jj
 
-A minimal Rust-based Python extension using PyO3 bindings with automated CI/CD pipeline.
+A minimal Rust-based Python extension using PyO3 bindings with automated CI/CD
+pipeline.
 
 [![CI](https://github.com/jj-devhub/demopy/actions/workflows/ci.yml/badge.svg)](https://github.com/jj-devhub/demopy/actions/workflows/ci.yml)
 [![PyPI version](https://badge.fury.io/py/demopy-gb-jj.svg)](https://badge.fury.io/py/demopy-gb-jj)
@@ -8,9 +9,12 @@ A minimal Rust-based Python extension using PyO3 bindings with automated CI/CD p
 
 ## Features
 
-- **Rust-Python Integration**: High-performance Rust functions exposed to Python via PyO3
-- **Fallback Support**: Pure Python implementations when Rust extension is unavailable
-- **Automated CI/CD**: GitHub Actions workflows for testing, building, and publishing
+- **Rust-Python Integration**: High-performance Rust functions exposed to Python
+via PyO3
+- **Fallback Support**: Pure Python implementations when Rust extension is
+unavailable
+- **Automated CI/CD**: GitHub Actions workflows for testing, building, and
+publishing
 - **Version Management**: Automated version bumping across all project files
 - **Cross-Platform**: Supports Windows, macOS, and Linux
 - **Multiple Python Versions**: Compatible with Python 3.8-3.13
@@ -21,7 +25,7 @@ A minimal Rust-based Python extension using PyO3 bindings with automated CI/CD p
 
 ```bash
 pip install demopy_gb_jj
-```
+```text
 
 ### From Source
 
@@ -38,7 +42,7 @@ pip install maturin
 
 # Build and install the package
 maturin develop
-```
+```text
 
 ## Usage
 
@@ -59,7 +63,7 @@ print(demopy.reverse_string("Hello, World!"))  # "!dlroW ,olleH"
 
 # Version info
 print(demopy.__version__)  # Current version
-```
+```text
 
 ## Development
 
@@ -92,7 +96,7 @@ maturin develop
 # Run tests
 pytest tests/ -v
 cargo test
-```
+```text
 
 ### Code Quality
 
@@ -104,9 +108,10 @@ python scripts/setup_pre_commit.py
 
 # Hooks run automatically on git commit
 git commit -m "your changes"  # Hooks auto-format and check code
-```
+```text
 
 **Available quality tools:**
+
 - **Black**: Python code formatting (88-char line length)
 - **isort**: Import statement sorting
 - **flake8**: Python linting and PEP 8 compliance
@@ -118,7 +123,7 @@ See [docs/PRE_COMMIT_HOOKS.md](docs/PRE_COMMIT_HOOKS.md) for detailed informatio
 
 ### Project Structure
 
-```
+```text
 demopy/
 ├── .github/workflows/     # GitHub Actions CI/CD
 ├── docs/                  # Documentation
@@ -130,7 +135,7 @@ demopy/
 ├── Cargo.toml            # Rust package configuration
 ├── pyproject.toml        # Python package configuration
 └── README.md
-```
+```text
 
 ### Version Management
 
@@ -162,7 +167,7 @@ python scripts/bump_version.py major
 
 # Set specific version
 python scripts/bump_version.py 1.2.3
-```
+```text
 
 ### Testing
 
@@ -191,7 +196,7 @@ builtins.__import__ = mock_import
 import demopy
 print(demopy.hello())
 "
-```
+```text
 
 ### Building and Publishing
 
@@ -247,11 +252,14 @@ The Python module in `python/demopy/__init__.py` provides:
 
 ### Fallback Mechanism
 
-If the Rust extension fails to load, the package automatically falls back to pure Python implementations, ensuring the package works even in environments where the Rust extension cannot be built or loaded.
+If the Rust extension fails to load, the package automatically falls back to
+pure Python implementations, ensuring the package works even in environments
+where the Rust extension cannot be built or loaded.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE)
+file for details.
 
 ## Changelog
 

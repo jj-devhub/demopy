@@ -1,6 +1,7 @@
 # GitHub Actions Setup Guide
 
-This guide explains how to configure GitHub repository settings to enable the automated CI/CD pipeline for demopy_gb_jj.
+This guide explains how to configure GitHub repository settings to enable the
+automated CI/CD pipeline for demopy_gb_jj.
 
 ## 🔧 Repository Settings Configuration
 
@@ -30,8 +31,10 @@ This guide explains how to configure GitHub repository settings to enable the au
    - ❌ **"Restrict pushes that create files"** (leave unchecked for automation)
 
 3. **Allow Automation**:
-   - ✅ **"Allow force pushes"** → **"Specify who can force push"** → Add `github-actions[bot]`
-   - Or alternatively, don't enable force push restrictions
+
+- ✅ **"Allow force pushes"** → **"Specify who can force push"** → Add
+`github-actions[bot]`
+  - Or alternatively, don't enable force push restrictions
 
 ### **Step 3: Configure Secrets (If Using Personal Access Token)**
 
@@ -52,23 +55,27 @@ If you prefer using a Personal Access Token instead of GITHUB_TOKEN:
    - Value: Your generated token
 
 3. **Update Workflow** (if using PAT):
+
    ```yaml
    - uses: actions/checkout@v4
      with:
        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-   ```
+   ```text
 
 ## 🔍 Troubleshooting Common Issues
 
 ### **Issue 1: "Permission denied" Error**
 
 **Symptoms:**
-```
+
+```bash
 remote: Permission to jj-devhub/demopy.git denied to github-actions[bot]
-fatal: unable to access 'https://github.com/jj-devhub/demopy.git/': The requested URL returned error: 403
-```
+fatal: unable to access 'https://github.com/jj-devhub/demopy.git/': The
+requested URL returned error: 403
+```text
 
 **Solutions:**
+
 1. ✅ Verify workflow permissions are set to "Read and write"
 2. ✅ Check that branch protection allows automation
 3. ✅ Ensure GITHUB_TOKEN has proper scopes
@@ -77,46 +84,57 @@ fatal: unable to access 'https://github.com/jj-devhub/demopy.git/': The requeste
 ### **Issue 2: "Resource not accessible by integration" Error**
 
 **Symptoms:**
-```
+
+```bash
 Resource not accessible by integration
-```
+```text
 
 **Solutions:**
+
 1. ✅ Add explicit permissions to workflow file:
+
    ```yaml
    permissions:
      contents: write
      actions: write
-   ```
+   ```text
+
 2. ✅ Check repository settings allow workflow permissions
 
 ### **Issue 3: Infinite Loop Prevention**
 
 **Symptoms:**
+
 - Workflow triggers itself repeatedly
 - Multiple version bump commits
 
 **Solutions:**
+
 1. ✅ Use `[skip ci]` in commit messages:
+
    ```yaml
    git commit -m "chore: bump version to X.Y.Z [skip ci]"
-   ```
+   ```text
+
 2. ✅ Add path exclusions to workflow triggers:
+
    ```yaml
    on:
      push:
        paths-ignore:
          - 'version-bump-commits'
-   ```
+   ```text
 
 ### **Issue 4: Tag Already Exists**
 
 **Symptoms:**
-```
+
+```text
 fatal: tag 'v1.0.0' already exists
-```
+```text
 
 **Solutions:**
+
 1. ✅ Check for existing tags before creation
 2. ✅ Use conditional tag creation in workflow
 3. ✅ Implement tag cleanup if needed
@@ -131,11 +149,13 @@ fatal: tag 'v1.0.0' already exists
 | **Lifetime** | Per workflow run | Until manually revoked |
 | **Security** | Automatically managed | Manually managed |
 | **Permissions** | Limited by workflow | Full user permissions |
-| **Recommendation** | ✅ Preferred for most cases | Use only if GITHUB_TOKEN insufficient |
+| **Recommendation** | ✅ Preferred for most cases | Use if TOKEN insufficient |
 
 ### **Recommended Approach:**
+
 1. **Start with GITHUB_TOKEN** with proper permissions
-2. **Use Personal Access Token** only if GITHUB_TOKEN limitations prevent functionality
+2.
+**Use Personal Access Token** only if GITHUB_TOKEN limitations prevent functionality
 3. **Regularly rotate** Personal Access Tokens if used
 4. **Use fine-grained tokens** when available
 
@@ -155,12 +175,14 @@ After configuration, verify the setup:
 ## 🚀 Testing the Configuration
 
 ### **Manual Test:**
+
 1. Make a small change to the repository
 2. Commit with semantic message: `feat: test automated pipeline`
 3. Push to main branch
 4. Monitor GitHub Actions for successful execution
 
 ### **Expected Behavior:**
+
 1. ✅ Workflow triggers automatically
 2. ✅ Version analysis completes
 3. ✅ Version files are updated
@@ -182,12 +204,14 @@ If you encounter issues:
 ## 🔄 Maintenance
 
 ### **Regular Tasks:**
+
 - [ ] Review and rotate Personal Access Tokens (if used)
 - [ ] Update workflow permissions as needed
 - [ ] Monitor for GitHub Actions platform updates
 - [ ] Test automation periodically
 
 ### **When to Update:**
+
 - GitHub Actions introduces new permission models
 - Repository structure changes significantly
 - Security requirements change
@@ -195,4 +219,5 @@ If you encounter issues:
 
 ---
 
-**This configuration enables fully automated CI/CD with proper security and reliability!** 🎉
+**This configuration enables fully automated CI/CD with proper security and
+reliability!** 🎉

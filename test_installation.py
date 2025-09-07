@@ -63,7 +63,7 @@ else:
 
 print("=== ALL TESTS PASSED ===")
 '''
-    
+
     return run_command(f'python -c "{test_code}"', "Test package functionality")
 
 
@@ -91,7 +91,7 @@ print(f"hello(): {hello_msg}")
 
 if "Python fallback" in hello_msg:
     print("✅ Fallback mechanism working correctly")
-    
+
     # Test all fallback functions
     print(f"add(5, 7): {demopy.add(5, 7)}")
     print(f"multiply(3.0, 2.5): {demopy.multiply(3.0, 2.5)}")
@@ -104,7 +104,7 @@ else:
 
 print("=== FALLBACK TEST PASSED ===")
 '''
-    
+
     return run_command(f'python -c "{fallback_test}"', "Test fallback mechanism")
 
 
@@ -112,24 +112,24 @@ def main():
     """Main test function."""
     print("🚀 Starting End-to-End Package Testing")
     print("=" * 50)
-    
+
     # Test 1: Install package from PyPI
     success = run_command(
-        "pip install --upgrade demopy_gb_jj", 
+        "pip install --upgrade demopy_gb_jj",
         "Install package from PyPI"
     )
     if not success:
         print("❌ Package installation failed. Check if it's published to PyPI.")
         return False
-    
+
     # Test 2: Test package functionality
     if not test_package_functionality():
         return False
-    
+
     # Test 3: Test fallback mechanism
     if not test_fallback_mechanism():
         return False
-    
+
     # Test 4: Verify version consistency
     success = run_command(
         'python -c "import demopy; print(f\'Package version: {demopy.__version__}\')"',
@@ -137,7 +137,7 @@ def main():
     )
     if not success:
         return False
-    
+
     print("\n" + "=" * 50)
     print("🎉 ALL END-TO-END TESTS PASSED!")
     print("✅ Package installation successful")
@@ -145,7 +145,7 @@ def main():
     print("✅ All functions operational")
     print("✅ Version consistency verified")
     print("=" * 50)
-    
+
     return True
 
 

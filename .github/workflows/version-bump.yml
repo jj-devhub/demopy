@@ -27,23 +27,23 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    
+
     - name: Configure Git
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-    
+
     - name: Bump version
       id: bump
       run: |
@@ -55,7 +55,7 @@ jobs:
           NEW_VERSION=$(python scripts/get_version.py)
         fi
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-    
+
     - name: Commit changes
       run: |
         git add -A
@@ -65,12 +65,12 @@ jobs:
           git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
         fi
         git push origin main
-    
+
     - name: Create and push tag
       run: |
         git tag "v${{ steps.bump.outputs.new_version }}"
         git push origin "v${{ steps.bump.outputs.new_version }}"
-    
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:

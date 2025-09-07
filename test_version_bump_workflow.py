@@ -19,10 +19,10 @@ def run_command(cmd, description, check=True):
     print(f"🔄 {description}...")
     try:
         result = subprocess.run(
-            cmd, 
-            shell=True, 
-            check=check, 
-            capture_output=True, 
+            cmd,
+            shell=True,
+            check=check,
+            capture_output=True,
             text=True
         )
         print(f"✅ {description} - SUCCESS")
@@ -51,22 +51,22 @@ def test_version_bump_logic():
     print("\n" + "="*50)
     print("🔢 TESTING VERSION BUMP LOGIC")
     print("="*50)
-    
+
     # Get current version
     current_version = get_current_version()
     print(f"Current version: {current_version}")
-    
+
     # Test the version extraction command from workflow
     cmd = 'python scripts/get_version.py'
     success, extracted_version = run_command(cmd, "Test version extraction command")
-    
+
     if not success:
         return False
-    
+
     if extracted_version != current_version:
         print(f"❌ Version mismatch: expected {current_version}, got {extracted_version}")
         return False
-    
+
     print(f"✅ Version extraction works correctly: {extracted_version}")
     return True
 
@@ -76,48 +76,48 @@ def test_version_bump_script():
     print("\n" + "="*50)
     print("📝 TESTING VERSION BUMP SCRIPT")
     print("="*50)
-    
+
     # Create a backup of current files
     backup_dir = Path("backup_test")
     backup_dir.mkdir(exist_ok=True)
-    
+
     files_to_backup = ["pyproject.toml", "Cargo.toml", "python/demopy/__init__.py"]
     for file_path in files_to_backup:
         if Path(file_path).exists():
             shutil.copy2(file_path, backup_dir / Path(file_path).name)
-    
+
     try:
         # Get current version
         current_version = get_current_version()
         print(f"Current version: {current_version}")
-        
+
         # Test patch bump
         success, output = run_command(
             "python scripts/bump_version.py patch",
             "Test patch version bump"
         )
-        
+
         if not success:
             return False
-        
+
         # Get new version
         new_version = get_current_version()
         print(f"New version after patch bump: {new_version}")
-        
+
         # Test the extraction command with new version
         cmd = 'python scripts/get_version.py'
         success, extracted_version = run_command(cmd, "Test version extraction after bump")
-        
+
         if not success:
             return False
-        
+
         if extracted_version != new_version:
             print(f"❌ Version extraction failed after bump: expected {new_version}, got {extracted_version}")
             return False
-        
+
         print(f"✅ Version bump and extraction work correctly")
         return True
-        
+
     finally:
         # Restore backup files
         print("🔄 Restoring backup files...")
@@ -125,7 +125,7 @@ def test_version_bump_script():
             backup_file = backup_dir / Path(file_path).name
             if backup_file.exists():
                 shutil.copy2(backup_file, file_path)
-        
+
         # Clean up backup directory
         shutil.rmtree(backup_dir)
         print("✅ Files restored from backup")
@@ -136,7 +136,7 @@ def test_workflow_yaml():
     print("\n" + "="*50)
     print("📄 TESTING WORKFLOW YAML SYNTAX")
     print("="*50)
-    
+
     try:
         import yaml
         with open('.github/workflows/version-bump.yml', 'r') as f:
@@ -156,34 +156,34 @@ def simulate_workflow_steps():
     print("\n" + "="*50)
     print("🔄 SIMULATING WORKFLOW STEPS")
     print("="*50)
-    
+
     # Step 1: Test version bump
     print("Step 1: Version bump simulation")
     current_version = get_current_version()
     print(f"  Current version: {current_version}")
-    
+
     # Step 2: Test version extraction (the problematic step)
     print("Step 2: Version extraction simulation")
     cmd = 'python scripts/get_version.py'
     success, version = run_command(cmd, "Simulate NEW_VERSION extraction")
-    
+
     if not success:
         return False
-    
+
     # Step 3: Test output variable setting
     print("Step 3: Output variable simulation")
     print(f"  Would set: new_version={version}")
-    
+
     # Step 4: Test commit message generation
     print("Step 4: Commit message simulation")
     commit_msg = f"Bump version to {version}"
     print(f"  Commit message: {commit_msg}")
-    
+
     # Step 5: Test tag generation
     print("Step 5: Tag generation simulation")
     tag_name = f"v{version}"
     print(f"  Tag name: {tag_name}")
-    
+
     print("✅ All workflow steps simulated successfully")
     return True
 
@@ -193,12 +193,12 @@ def main():
     print("🚀 Version Bump Workflow Testing")
     print("Testing the workflow logic before GitHub Actions execution")
     print("="*60)
-    
+
     # Check if we're in the right directory
     if not Path("pyproject.toml").exists():
         print("❌ pyproject.toml not found. Please run this script from the project root.")
         return False
-    
+
     # Run tests
     tests = [
         ("Workflow YAML Syntax", test_workflow_yaml),
@@ -206,7 +206,7 @@ def main():
         ("Workflow Steps Simulation", simulate_workflow_steps),
         ("Version Bump Script", test_version_bump_script),
     ]
-    
+
     results = {}
     for test_name, test_func in tests:
         try:
@@ -214,19 +214,19 @@ def main():
         except Exception as e:
             print(f"❌ {test_name} failed with exception: {e}")
             results[test_name] = False
-    
+
     # Summary
     print("\n" + "="*60)
     print("📊 TEST SUMMARY")
     print("="*60)
-    
+
     all_passed = True
     for test_name, passed in results.items():
         status = "✅ PASSED" if passed else "❌ FAILED"
         print(f"{test_name}: {status}")
         if not passed:
             all_passed = False
-    
+
     if all_passed:
         print("\n🎉 ALL TESTS PASSED!")
         print("✅ Version bump workflow should work correctly")
@@ -235,7 +235,7 @@ def main():
     else:
         print("\n⚠️  SOME TESTS FAILED")
         print("❌ Fix issues before running workflow")
-    
+
     return all_passed
 
 

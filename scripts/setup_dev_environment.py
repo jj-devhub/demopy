@@ -11,7 +11,6 @@ This script sets up all the necessary tools for development including:
 
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 

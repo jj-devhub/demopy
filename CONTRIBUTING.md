@@ -1,56 +1,64 @@
 # Contributing to demopy_gb_jj
 
-Thank you for your interest in contributing to demopy_gb_jj! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to demopy_gb_jj! This document
+provides guidelines for contributing to the project.
 
 ## 🚀 Automated Release Pipeline
 
-This project uses an **automated CI/CD pipeline** that automatically handles versioning, building, and publishing based on your commit messages. Understanding how this works will help you contribute effectively.
+This project uses an **automated CI/CD pipeline** that automatically handles
+versioning, building, and publishing based on your commit messages.
+Understanding how this works will help you contribute effectively.
 
 ### 📝 Commit Message Conventions
 
-We use **semantic commit messages** to automatically determine version bumps and generate changelogs. Please follow these conventions:
+We use **semantic commit messages** to automatically determine version bumps
+and generate changelogs. Please follow these conventions:
 
 #### **Format:**
-```
+
+```text
 <type>: <description>
 
 [optional body]
 
 [optional footer]
-```
+```text
 
 #### **Types and Version Impact:**
 
 | Commit Type | Version Bump | Example |
 |-------------|--------------|---------|
-| `feat:` or `feature:` | **Minor** (0.4.0 → 0.5.0) | `feat: add new mathematical functions` |
-| `fix:` or `patch:` | **Patch** (0.4.0 → 0.4.1) | `fix: resolve memory leak in Rust extension` |
-| `BREAKING CHANGE:` or `major:` | **Major** (0.4.0 → 1.0.0) | `feat: redesign API (BREAKING CHANGE)` |
-| `chore:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:` | **Patch** (0.4.0 → 0.4.1) | `chore: update dependencies` |
+| `feat:` or `feature:` | **Minor** (0.4.0 → 0.5.0) | `feat: add new functions` |
+| `fix:` or `patch:` | **Patch** (0.4.0 → 0.4.1) | `fix: resolve memory leak` |
+| `BREAKING CHANGE:` or `major:` | **Major** (0.4.0 → 1.0.0) | `feat: redesign` |
+| `chore:`, `docs:`, etc. | **Patch** (0.4.0 → 0.4.1) | `chore: update deps` |
 
 #### **Examples:**
 
 **New Feature (Minor Version Bump):**
-```
+
+```text
 feat: add trigonometric functions to Rust extension
 
 - Add sin, cos, tan functions
 - Include comprehensive tests
 - Update documentation with examples
-```
+```text
 
 **Bug Fix (Patch Version Bump):**
-```
+
+```text
 fix: resolve division by zero error in multiply function
 
 The multiply function now properly handles edge cases where
 one of the operands is zero.
 
 Fixes #123
-```
+```text
 
 **Breaking Change (Major Version Bump):**
-```
+
+```python
 feat: redesign function signatures for better type safety
 
 BREAKING CHANGE: All function signatures now require explicit
@@ -60,16 +68,19 @@ backward compatibility with versions < 1.0.0.
 Migration guide:
 - Old: demopy.add(5, 7)
 - New: demopy.add(5, 7)  # (no change in usage, but internal types changed)
-```
+```text
 
 **Maintenance (Patch Version Bump):**
+
 ```
+
 chore: update Rust dependencies to latest versions
 
 - Update maturin to 1.4.0
 - Update pyo3 to 0.20.0
 - All tests pass with new versions
-```
+
+```text
 
 ### 🔄 Automated Workflow Process
 
@@ -85,13 +96,15 @@ When you push commits to the `main` branch:
 
 ### 🚫 Skipping Automatic Releases
 
-If you want to push changes without triggering a release, include `[skip ci]` in your commit message:
+If you want to push changes without triggering a release, include `[skip ci]` in
+your commit message:
 
-```
+```python
 docs: update README with new examples [skip ci]
-```
+```text
 
 Or use commit types that don't trigger releases:
+
 - `docs:` - Documentation changes
 - `style:` - Code formatting changes
 - `test:` - Test-only changes
@@ -101,17 +114,20 @@ Or use commit types that don't trigger releases:
 ### **Setting Up Development Environment:**
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/jj-devhub/demopy.git
    cd demopy
-   ```
+   ```text
 
 2. **Set up development environment (automated):**
+
    ```bash
    python scripts/setup_dev_environment.py
-   ```
+   ```text
 
    Or manually:
+
    ```bash
    # Install Rust tools
    rustup component add rustfmt clippy
@@ -121,46 +137,52 @@ Or use commit types that don't trigger releases:
 
    # Set up pre-commit hooks
    pre-commit install
-   ```
+   ```text
 
 3. **Build and install in development mode:**
+
    ```bash
    maturin develop
    # Or use the Makefile
    make dev-install
-   ```
+   ```text
 
 4. **Run tests:**
+
    ```bash
    pytest
    # Or use the Makefile
    make test
-   ```
+   ```text
 
 ### **Making Changes:**
 
 1. **Create a feature branch:**
+
    ```bash
    git checkout -b feature/your-feature-name
-   ```
+   ```text
 
 2. **Make your changes** following the coding standards
 
 3. **Test your changes:**
+
    ```bash
    maturin develop
    pytest
-   ```
+   ```text
 
 4. **Commit with semantic messages:**
+
    ```bash
    git commit -m "feat: add your new feature"
-   ```
+   ```text
 
 5. **Push and create a pull request:**
+
    ```bash
    git push origin feature/your-feature-name
-   ```
+   ```text
 
 ### **Pull Request Process:**
 
@@ -183,6 +205,7 @@ If you need to manually trigger a release:
 ## 🧪 Testing
 
 ### **Running Tests Locally:**
+
 ```bash
 # Install in development mode
 maturin develop
@@ -192,19 +215,21 @@ pytest
 
 # Run Rust tests
 cargo test
-```
+```text
 
 ### **Testing Different Python Versions:**
+
 ```bash
 # Test with specific Python version
 python3.8 -m pytest
 python3.9 -m pytest
 python3.10 -m pytest
-```
+```text
 
 ## 📋 Code Standards
 
 ### **Automated Code Quality:**
+
 Our project uses automated code formatting and quality checks:
 
 - **Pre-commit hooks**: Automatically format and check code before commits
@@ -212,6 +237,7 @@ Our project uses automated code formatting and quality checks:
 - **Make commands**: Easy access to all quality tools
 
 ### **Python Code:**
+
 - **Formatting**: Automatically formatted with `black` (88 char line length)
 - **Import sorting**: Automatically sorted with `isort`
 - **Linting**: Checked with `flake8`
@@ -220,6 +246,7 @@ Our project uses automated code formatting and quality checks:
 - **Security**: Scanned with `safety` and `bandit`
 
 ### **Rust Code:**
+
 - **Formatting**: Automatically formatted with `cargo fmt`
 - **Linting**: Checked with `cargo clippy` (warnings as errors)
 - **Testing**: Comprehensive test coverage required
@@ -227,6 +254,7 @@ Our project uses automated code formatting and quality checks:
 - **Documentation**: Document all public APIs
 
 ### **Quality Commands:**
+
 ```bash
 # Format all code
 make format
@@ -242,9 +270,10 @@ make check
 
 # Simulate CI pipeline locally
 make ci
-```
+```text
 
 ### **Commit Messages:**
+
 - Use semantic commit message format
 - Keep the first line under 50 characters
 - Use imperative mood ("add" not "added")
@@ -263,11 +292,13 @@ When reporting issues:
 
 ## 📄 License
 
-By contributing to this project, you agree that your contributions will be licensed under the MIT License.
+By contributing to this project, you agree that your contributions will be
+licensed under the MIT License.
 
 ## 🤝 Code of Conduct
 
-Please be respectful and inclusive in all interactions. We want this to be a welcoming community for everyone.
+Please be respectful and inclusive in all interactions.
+We want this to be a welcoming community for everyone.
 
 ## 📞 Getting Help
 
