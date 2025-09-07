@@ -12,7 +12,7 @@ repos:
         language: system
         files: \.rs$
         pass_filenames: false
-      
+
       - id: cargo-clippy
         name: Cargo clippy
         description: Lint Rust code with cargo clippy
@@ -20,7 +20,7 @@ repos:
         language: system
         files: \.rs$
         pass_filenames: false
-      
+
       - id: cargo-test
         name: Cargo test
         description: Run Rust tests
@@ -37,7 +37,6 @@ repos:
         name: Black Python formatter
         description: Format Python code with Black
         files: ^(python|tests|scripts)/.*\.py$
-        args: [--line-length=88]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
@@ -46,7 +45,7 @@ repos:
         name: isort Python import sorter
         description: Sort Python imports with isort
         files: ^(python|tests|scripts)/.*\.py$
-        args: [--profile=black, --line-length=88]
+        args: [--profile=black]
 
   - repo: https://github.com/pycqa/flake8
     rev: 7.1.1
@@ -55,7 +54,6 @@ repos:
         name: Flake8 Python linter
         description: Lint Python code with flake8
         files: ^(python|tests|scripts)/.*\.py$
-        args: [--max-line-length=88, --extend-ignore=E203,W503]
 
   # Python type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -66,7 +64,6 @@ repos:
         description: Static type checking for Python
         files: ^(python|tests|scripts)/.*\.py$
         args: [--ignore-missing-imports, --no-strict-optional]
-        additional_dependencies: [types-all]
 
   # General file formatting
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -75,25 +72,25 @@ repos:
       - id: trailing-whitespace
         name: Trim trailing whitespace
         description: Remove trailing whitespace
-      
+
       - id: end-of-file-fixer
         name: Fix end of files
         description: Ensure files end with a newline
-      
+
       - id: check-yaml
         name: Check YAML
         description: Validate YAML files
         files: \.(yaml|yml)$
-      
+
       - id: check-toml
         name: Check TOML
         description: Validate TOML files
         files: \.toml$
-      
+
       - id: check-merge-conflict
         name: Check for merge conflicts
         description: Check for merge conflict markers
-      
+
       - id: check-added-large-files
         name: Check for large files
         description: Prevent large files from being committed
