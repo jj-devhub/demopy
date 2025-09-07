@@ -83,6 +83,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install development dependencies
 pip install maturin pytest
 
+# Set up pre-commit hooks for code quality (recommended)
+python scripts/setup_pre_commit.py
+
 # Build the extension in development mode
 maturin develop
 
@@ -91,15 +94,39 @@ pytest tests/ -v
 cargo test
 ```
 
+### Code Quality
+
+This project uses automated code quality enforcement through pre-commit hooks:
+
+```bash
+# Set up pre-commit hooks (one-time setup)
+python scripts/setup_pre_commit.py
+
+# Hooks run automatically on git commit
+git commit -m "your changes"  # Hooks auto-format and check code
+```
+
+**Available quality tools:**
+- **Black**: Python code formatting (88-char line length)
+- **isort**: Import statement sorting
+- **flake8**: Python linting and PEP 8 compliance
+- **mypy**: Static type checking (optional)
+- **cargo fmt**: Rust code formatting
+- **cargo clippy**: Rust linting
+
+See [docs/PRE_COMMIT_HOOKS.md](docs/PRE_COMMIT_HOOKS.md) for detailed information.
+
 ### Project Structure
 
 ```
 demopy/
 ├── .github/workflows/     # GitHub Actions CI/CD
+├── docs/                  # Documentation
 ├── python/demopy/         # Python package source
 ├── src/                   # Rust source code
 ├── tests/                 # Test files
 ├── scripts/               # Utility scripts
+├── .pre-commit-config.yaml # Pre-commit hooks configuration
 ├── Cargo.toml            # Rust package configuration
 ├── pyproject.toml        # Python package configuration
 └── README.md
